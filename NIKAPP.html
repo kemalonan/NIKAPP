@@ -1079,10 +1079,10 @@ function toggleDone(id){
   svTasks();
   const el=document.getElementById('tc-'+id);if(el)el.outerHTML=taskCardHTML(t);
 }
-function delTask(id){
+async function delTask(id){
   if(!confirm('Görevi sil?'))return;
   STATE.tasks=STATE.tasks.filter(t=>t.id!==id);
-  svTasks();
+  await sbDelete('tasks',id);
   localStorage.setItem('_nika_tasks_local',JSON.stringify(STATE.tasks));
   renderPage();
 }
