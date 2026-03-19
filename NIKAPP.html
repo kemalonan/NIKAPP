@@ -2222,7 +2222,7 @@ function renderSettingsPage(el){
           ${avatarHTML(usr,26)}
           <div style="flex:1;min-width:0;font-size:.8rem">${esc(usr.name)} <span style="color:var(--text3)">· ${esc(usr.email||'')}</span></div>
           <span class="rbadge rb-${usr.role}">${roleName(usr.role)}</span>
-          ${usr.id!==STATE.cu.id?`<button class="ib del" onclick="deleteUser('${usr.id}')">✕</button>`:''}
+          ${usr.id!==STATE.cu.id&&canManage(STATE.cu)?`<button class="ib del" onclick="deleteUser('${usr.id}')">✕</button>`:''}
         </div>`).join(''):`<div style="font-size:.75rem;color:var(--text3)">Kullanıcı yönetimi patron/koordinatöre açık.</div>`}
     </div>
   </div>`;
@@ -2291,10 +2291,12 @@ function saveNotifSettings(){
   if(idx>-1){STATE.users[idx].teamsWebhook=webhook;STATE.cu=STATE.users[idx];sS(STATE.cu);}
   svUsers();alert('Bildirim ayarları kaydedildi.');
 }
-function deleteUser(id){
+async function deleteUser(id){
   if(!canManage(STATE.cu)){alert('Yetki yok');return}
   if(!confirm('Kullanıcı silinsin mi?'))return;
-  STATE.users=STATE.users.filter(u=>u.id!==id);svUsers();renderPage();
+  STATE.users=STATE.users.filter(u=>u.id!==id);
+  await sbDelete('users',id);
+  renderPage();
 }
 
 // ─── UTILS ────────────────────────────────────────────────────────
