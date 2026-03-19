@@ -1081,7 +1081,10 @@ function toggleDone(id){
 }
 function delTask(id){
   if(!confirm('Görevi sil?'))return;
-  STATE.tasks=STATE.tasks.filter(t=>t.id!==id);svTasks();renderPage();
+  STATE.tasks=STATE.tasks.filter(t=>t.id!==id);
+  svTasks();
+  localStorage.setItem('_nika_tasks_local',JSON.stringify(STATE.tasks));
+  renderPage();
 }
 function toggleStDrop(id){
   const d=document.getElementById('std-'+id);
