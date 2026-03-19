@@ -840,6 +840,7 @@ function registerHTML(){
     <div class="auth-info">📧 Şirket e-postanızı girin. Görev bildirimleri bu adrese gönderilecektir.</div>
     <div><label class="flabel">Ad Soyad *</label><input class="finput" id="rg-name" placeholder="Ad Soyad" /></div>
     <div><label class="flabel">Şirket E-postası *</label><input class="finput" type="email" id="rg-email" placeholder="ad.soyad@nikabim-dc.com" /></div>
+    <div><label class="flabel">Şifre (en az 4 karakter) *</label><input class="finput" type="password" id="rg-pass" placeholder="Şifre" /></div>
     <div><label class="flabel">Rol *</label>
       <select class="finput" id="rg-role">
         ${ROLES.map(r=>`<option value="${r.v}">${r.l}</option>`).join('')}
@@ -852,17 +853,24 @@ function registerHTML(){
 function registerUser(){
   const name=document.getElementById('rg-name')?.value.trim();
   const email=document.getElementById('rg-email')?.value.trim();
+  const pass=document.getElementById('rg-pass')?.value;
   const role=document.getElementById('rg-role')?.value;
-  if(!name||!email){alert('Ad ve e-posta zorunlu');return}
+  if(!name||!email||!pass){alert('Ad, e-posta ve şifre zorunlu');return}
+  if(pass.length<4){alert('Şifre en az 4 karakter olmalı');return}
   if(STATE.users.find(u=>u.email===email)){alert('Bu e-posta zaten kayıtlı');return}
-  const u={id:genId(),name,email,role,initials:name.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2),notifEmail:true,notifTeams:false,createdAt:new Date().toISOString()};
+  const u={id:genId(),name,email,role,password_hash:pass,initials:name.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2),photo:null,notif_email:true,notif_teams:false,teams_webhook:'',created_at:new Date().toISOString()};
   STATE.users.push(u);svUsers();
   authTab='login';renderAuth();
 }
 
 function login(id){
-  STATE.cu=STATE.users.find(u=>u.id===id);
-  if(!STATE.cu)return;
+  const user=STATE.users.find(u=>u.id===id);
+  if(!user)return;
+  const pass=prompt('Şifreni gir:');
+  if(!pass)return;
+  // Basit kontrol (production'da proper hash kontrol lazım)
+  if(pass!==user.password_hash){alert('❌ Şifre yanlış');return}
+  STATE.cu=user;
   sS(STATE.cu);STATE.page='tasks';render();
 }
 function logout(){STATE.cu=null;cS();render()}
