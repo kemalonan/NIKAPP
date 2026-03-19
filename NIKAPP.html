@@ -578,12 +578,7 @@ function startRealtime(){
 
 // ─── SAVE WRAPPERS (replace localStorage sv()) ───────────────────
 async function svTasks(){
-  // Supabase'e tüm task'ları kaydet (silinenleri de handle et)
-  if(STATE.tasks.length === 0) {
-    // Hiç task kalmadıysa, önceki task'ları temizle
-    console.log('⚠️ Tüm görevler silindi');
-  }
-  await sbUpsert('tasks', STATE.tasks.map(taskToDb));
+  await sbUpsert('tasks',STATE.tasks.map(taskToDb));
 }
 async function svUsers(){
   await sbUpsert('users',STATE.users.map(userToDb));
@@ -1086,31 +1081,7 @@ function toggleDone(id){
 }
 function delTask(id){
   if(!confirm('Görevi sil?'))return;
-  const task = STATE.tasks.find(t => t.id === id);
-  if(!task) { console.log('Görev bulunamadı'); return; }
-  
-  // Eski task'ı backup et (hata durumunda restore etmek için)
-  const backup = JSON.parse(JSON.stringify(STATE.tasks));
-  
-  STATE.tasks = STATE.tasks.filter(t => t.id !== id);
-  console.log('✓ UI'da silindi:', id);
-  renderPage();
-  
-  // Supabase'e DELETE isteği gönder
-  sbDelete('tasks', id).then(res => {
-    if(!res || res.error) {
-      console.error('❌ Supabase silme başarısız, geri yükleniyor...');
-      STATE.tasks = backup;  // Backup'tan restore et
-      renderPage();
-      alert('❌ Silme başarısız. Lütfen internet bağlantısını kontrol et.');
-    } else {
-      console.log('✅ Supabase'te silindi:', id);
-    }
-  }).catch(err => {
-    console.error('Delete error:', err);
-    STATE.tasks = backup;  // Hata durumunda restore et
-    renderPage();
-  });
+  STATE.tasks=STATE.tasks.filter(t=>t.id!==id);svTasks();renderPage();
 }
 function toggleStDrop(id){
   const d=document.getElementById('std-'+id);
@@ -1572,11 +1543,7 @@ function renderCategoriesPage(el){
   ${activeCat?catDetailHTML(activeCat,cats):''}`;
 }
 
-function selectCat(id){
-  STATE.catFilter=STATE.catFilter===id?'all':id;
-  localStorage.setItem('_nika_catfilter',STATE.catFilter);
-  renderPage();
-}
+function selectCat(id){STATE.catFilter=STATE.catFilter===id?'all':id;renderPage();}
 
 function catDetailHTML(cat,allCats){
   const saved=allCats.find(x=>x.id===cat.id)||{id:cat.id,files:[]};
@@ -2334,17 +2301,6 @@ function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
-  
-        // ====== EXAMPLE DATA (Supabase çalışmazsa) ======
-        if(!STATE.users||STATE.users.length===0){
-          STATE.users=[{"id":"u_patron","name":"Kemal Bey","email":"kemal@nikabim-dc.com","role":"patron","initials":"KB","photo":null,"notif_email":true,"notif_teams":true,"teams_webhook":"","created_at":"2025-01-01T00:00:00Z"},{"id":"u_k1","name":"Selin Arslan","email":"selin.arslan@nikabim-dc.com","role":"koordinator","initials":"SA","photo":null,"notif_email":true,"notif_teams":true,"teams_webhook":"","created_at":"2025-01-01T00:00:00Z"},{"id":"u_k2","name":"Cem Yıldız","email":"cem.yildiz@nikabim-dc.com","role":"koordinator","initials":"CY","photo":null,"notif_email":true,"notif_teams":true,"teams_webhook":"","created_at":"2025-01-01T00:00:00Z"},{"id":"u_e1","name":"Ayşe Kaya","email":"ayse.kaya@nikabim-dc.com","role":"engineer","initials":"AK","photo":null,"notif_email":true,"notif_teams":false,"teams_webhook":"","created_at":"2025-01-02T00:00:00Z"},{"id":"u_e2","name":"Burak Demir","email":"burak.demir@nikabim-dc.com","role":"engineer","initials":"BD","photo":null,"notif_email":true,"notif_teams":false,"teams_webhook":"","created_at":"2025-01-02T00:00:00Z"}];
-          console.log('📌 Example users loaded (Supabase unavailable)');
-        }
-        if(!STATE.tasks||STATE.tasks.length===0){
-          STATE.tasks=[{"id":"t_001","title":"EKGYO Block 5 BIM Modeli Güncelle","description":"Revit 2025.4'te Block 5 elementlerinin parametrelerini AI agent ile otomatik ata. EIB kategorisine ait.","assignees":["u_k1","u_e1"],"category_id":"eib","deadline":"2026-03-26","priority":"high","status":"devam","done":false,"recurring":false,"last_renew_month":"","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_patron","created_at":"2025-03-15T10:00:00Z"},{"id":"t_002","title":"Synchro 4D Script Belgesi Hazırla","description":"Türkçe/İngilizce bilingual post-training referans dokümanı. SET_PROPERTY ve TASK_STATUS komutlarıyla ilgili worked examples ekle.","assignees":["u_k2"],"category_id":"synchro4d","deadline":"2026-03-20","priority":"mid","status":"bekliyor","done":false,"recurring":false,"last_renew_month":"","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_patron","created_at":"2025-03-16T09:00:00Z"},{"id":"t_003","title":"OpenSpace Model İçe Aktar","description":"Mevcut proje klasöründen .obj/.fbx dosyalarını OpenSpace platform'ına yükle. YILDIZLAR projesi için.","assignees":["u_e2"],"category_id":"openspace","deadline":"2026-03-19","priority":"high","status":"devam","done":false,"recurring":false,"last_renew_month":"","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_k1","created_at":"2025-03-17T08:30:00Z"},{"id":"t_004","title":"Unreal Engine 5 Görselleştirme Prototip","description":"EMLAKKONUT projesi için gerçekçi render oluştur. Lighting ve material optimization.","assignees":["u_e1","u_e2"],"category_id":"unreal","deadline":"2026-04-02","priority":"mid","status":"bekliyor","done":false,"recurring":false,"last_renew_month":"","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_patron","created_at":"2025-03-17T10:00:00Z"},{"id":"t_005","title":"SBG Proje Dosyaları Organize","description":"VCAD/Revit dosyalarını klasör yapısına göre düzenle. Naming convention'ları uygula.","assignees":["u_e1"],"category_id":"sbg","deadline":"2026-03-22","priority":"low","status":"tamamlandi","done":true,"recurring":false,"last_renew_month":"","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_k2","created_at":"2025-03-10T14:00:00Z"},{"id":"t_006","title":"Ofis İşleri - Raporlar Hazırla","description":"Aylık ilerleme raporu ve teknik özet. Excel dashboard ile sunumu.","assignees":["u_k1"],"category_id":"ofis","deadline":"2026-03-24","priority":"mid","status":"bekliyor","done":false,"recurring":true,"last_renew_month":"2025-03","image_url":null,"subtasks":[],"comments":[],"files":[],"created_by":"u_patron","created_at":"2025-03-01T09:00:00Z"}];
-          console.log('📌 Example tasks loaded (Supabase unavailable)');
-        }
-        
   render();
 });
 
@@ -2708,51 +2664,6 @@ window.addEventListener('load', function(){
     location.reload();
   }
 });
-function openDailyTaskModal(){
-  const modal=document.createElement('div');
-  modal.id='daily-task-modal';
-  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000';
-  modal.innerHTML=`
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:400px;width:90%">
-      <div style="font-weight:700;margin-bottom:15px;color:var(--gold)">📝 Günlük Görev Oluştur (Gizli)</div>
-      <input type="text" id="daily-title" placeholder="Görev başlığı..." style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);margin-bottom:10px;font-family:'Exo 2',sans-serif">
-      <textarea id="daily-desc" placeholder="Açıklama..." style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);margin-bottom:10px;min-height:60px;font-family:'Exo 2',sans-serif;resize:none"></textarea>
-      <div style="display:flex;gap:8px">
-        <button onclick="saveDailyTask()" style="flex:1;padding:8px;background:var(--gold);color:#080c12;border:none;border-radius:var(--r);cursor:pointer;font-weight:700;font-family:'Exo 2',sans-serif">Kaydet</button>
-        <button onclick="document.getElementById('daily-task-modal').remove()" style="flex:1;padding:8px;background:var(--border);color:var(--text);border:none;border-radius:var(--r);cursor:pointer;font-family:'Exo 2',sans-serif">İptal</button>
-      </div>
-      <div style="font-size:.7rem;color:var(--text3);margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">⚠️ Bu görev sadece sana görünecek, başkası göremeyecek.</div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('daily-title').focus();
-}
-
-function saveDailyTask(){
-  const title=document.getElementById('daily-title').value.trim();
-  const desc=document.getElementById('daily-desc').value.trim();
-  if(!title)return alert('Başlık gerekli');
-  
-  // Planner'da kaydet (localStorage)
-  const planner=JSON.parse(localStorage.getItem('nika_planner_v1')||'{}');
-  const today=new Date().toISOString().split('T')[0];
-  if(!planner[STATE.cu.id])planner[STATE.cu.id]={};
-  if(!planner[STATE.cu.id][today])planner[STATE.cu.id][today]={notes:'',priorities:[],mood:'',checked:[]};
-  
-  const dailyTasks=planner[STATE.cu.id][today].dailyTasks||[];
-  dailyTasks.push({id:genId(),title:title,desc:desc,done:false,createdAt:new Date().toISOString()});
-  planner[STATE.cu.id][today].dailyTasks=dailyTasks;
-  
-  localStorage.setItem('nika_planner_v1',JSON.stringify(planner));
-  document.getElementById('daily-task-modal').remove();
-  renderPage();
-  
-  const toast=document.createElement('div');
-  toast.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green-bg);border:1px solid var(--green);border-radius:var(--r);padding:10px 18px;font-size:.8rem;color:var(--green);z-index:9999;font-weight:600';
-  toast.textContent='✓ Günlük görev oluşturuldu';
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),3000);
-}
 </script>
 
 </body>
