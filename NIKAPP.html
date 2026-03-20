@@ -520,7 +520,8 @@ function userToDb(u){return{
 function userFromDb(r){return{
   id:r.id,name:r.name,email:r.email||'',role:r.role,
   initials:r.initials||'',photo:r.photo||null,
-  notifEmail:r.notif_email,notifTeams:r.notif_teams,
+  password_hash:r.password_hash||'',
+  notif_email:r.notif_email,notif_teams:r.notif_teams,
   teamsWebhook:r.teams_webhook||null,createdAt:r.created_at
 };}
 function meetToDb(m){return{
