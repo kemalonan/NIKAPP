@@ -850,7 +850,7 @@ function registerHTML(){
   </div>`;
 }
 
-function registerUser(){
+async function registerUser(){
   const name=document.getElementById('rg-name')?.value.trim();
   const email=document.getElementById('rg-email')?.value.trim();
   const pass=document.getElementById('rg-pass')?.value;
@@ -859,7 +859,9 @@ function registerUser(){
   if(pass.length<4){alert('Şifre en az 4 karakter olmalı');return}
   if(STATE.users.find(u=>u.email===email)){alert('Bu e-posta zaten kayıtlı');return}
   const u={id:genId(),name,email,role,password_hash:pass,initials:name.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2),photo:null,notif_email:true,notif_teams:false,teams_webhook:'',created_at:new Date().toISOString()};
-  STATE.users.push(u);svUsers();
+  STATE.users.push(u);
+  await svUsers();
+  alert('✓ Kullanıcı oluşturuldu! Giriş yapabilirsin.');
   authTab='login';renderAuth();
 }
 
