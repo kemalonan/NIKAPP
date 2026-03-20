@@ -805,7 +805,6 @@ function render(){
 // ─── AUTH ────────────────────────────────────────────────────────
 let authTab='login';
 function renderAuth(){
-  const users=STATE.users;
   document.body.innerHTML=`
   <div class="auth-shell">
     <div class="auth-logo-wrap">
@@ -817,22 +816,17 @@ function renderAuth(){
         <div class="auth-tab ${authTab==='login'?'active':''}" onclick="authTab='login';renderAuth()">Giriş Yap</div>
         <div class="auth-tab ${authTab==='register'?'active':''}" onclick="authTab='register';renderAuth()">Kayıt Ol</div>
       </div>
-      ${authTab==='login'?loginHTML(users):registerHTML()}
+      ${authTab==='login'?loginHTML():registerHTML()}
     </div>
   </div>`;
 }
 
-function loginHTML(users){
-  if(!users.length)return`<div class="empty"><div class="empty-icon">👤</div><div>Henüz kayıtlı kullanıcı yok.<br>Kayıt Ol sekmesinden hesap oluşturun.</div></div>`;
-  return`<div class="auth-login-list">${users.map(u=>`
-    <button class="user-btn" onclick="login('${u.id}')">
-      ${avatarHTML(u,34)}
-      <div style="flex:1;min-width:0">
-        <div style="font-size:.85rem;font-weight:600">${esc(u.name)}</div>
-        <div style="font-size:.72rem;color:var(--text2)">${esc(u.email||'')} · ${roleName(u.role)}</div>
-      </div>
-      <span class="rbadge rb-${u.role}">${roleName(u.role)}</span>
-    </button>`).join('')}</div>`;
+function loginHTML(){
+  return`<div class="auth-form">
+    <div><label class="flabel">E-posta</label><input class="finput" id="li-email" placeholder="e-posta@nikabim-dc.com" type="email" /></div>
+    <div><label class="flabel">Şifre</label><input class="finput" id="li-pass" placeholder="Şifre" type="password" /></div>
+    <div class="fbtn-row"><button class="btn-ok" style="width:100%" onclick="doLogin()">Giriş Yap</button></div>
+  </div>`;
 }
 
 function registerHTML(){
@@ -865,16 +859,18 @@ async function registerUser(){
   authTab='login';renderAuth();
 }
 
-function login(id){
-  const user=STATE.users.find(u=>u.id===id);
-  if(!user)return;
-  const pass=prompt('Şifreni gir:');
-  if(!pass)return;
-  // Basit kontrol (production'da proper hash kontrol lazım)
+
+function doLogin(){
+  const email=document.getElementById('li-email')?.value.trim();
+  const pass=document.getElementById('li-pass')?.value.trim();
+  if(!email||!pass){alert('E-posta ve şifre zorunlu');return}
+  const user=STATE.users.find(u=>u.email===email);
+  if(!user){alert('❌ Kullanıcı bulunamadı');return}
   if(pass!==user.password_hash){alert('❌ Şifre yanlış');return}
   STATE.cu=user;
   sS(STATE.cu);STATE.page='tasks';render();
 }
+
 function logout(){STATE.cu=null;cS();render()}
 
 // ─── SHELL ───────────────────────────────────────────────────────
