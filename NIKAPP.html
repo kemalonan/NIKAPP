@@ -512,7 +512,8 @@ function taskFromDb(r){return{
 function userToDb(u){return{
   id:u.id,name:u.name,email:u.email||null,role:u.role,
   initials:u.initials||'',photo:u.photo||null,
-  notif_email:!!u.notifEmail,notif_teams:!!u.notifTeams,
+  password_hash:u.password_hash||'',
+  notif_email:!!u.notif_email,notif_teams:!!u.notif_teams,
   teams_webhook:u.teamsWebhook||null,
   created_at:u.createdAt||new Date().toISOString()
 };}
