@@ -781,14 +781,10 @@ const STATE={
 
 // ─── RECURRING RENEWAL ──────────────────────────────────────────
 function renewRecurring(){
-  const m=thisMonth();
-  STATE.tasks.forEach(t=>{
-    if(!t.recurring||t.lastRenewMonth===m)return;
-    // Silinenleri geri getirme (deleted flag kontrol et)
-    if(t.deleted)return;
-    t.done=false;t.lastRenewMonth=m;
-  });
-  svTasks();
+  // Deaktif - silinenleri geri getiriyor
+  // const m=thisMonth();
+  // STATE.tasks.forEach(t=>{...});
+  // svTasks();
 }
 
 // ─── RENDER ROOT ────────────────────────────────────────────────
@@ -1091,16 +1087,8 @@ function toggleDone(id){
 }
 function delTask(id){
   if(!confirm('Görevi sil?'))return;
-  const task = STATE.tasks.find(t=>t.id===id);
-  if(task && task.recurring){
-    // Recurring task: soft delete (recurring:false yap)
-    task.recurring = false;
-    svTasks();
-  } else {
-    // Normal task: hard delete
-    STATE.tasks = STATE.tasks.filter(t=>t.id!==id);
-    sbDelete('tasks',id);
-  }
+  STATE.tasks = STATE.tasks.filter(t=>t.id!==id);
+  sbDelete('tasks',id);
   renderPage();
 }
 function toggleStDrop(id){
