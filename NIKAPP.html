@@ -489,7 +489,7 @@ async function sbDelete(table, id){
 // ─── DB ↔ STATE MAPPERS ──────────────────────────────────────────
 function taskToDb(t){return{
   id:t.id,title:t.title,description:t.description||'',
-  assignees:t.assignees||[],category_id:t.categoryId||null,
+  assignees:t.assignees||[],owner_id:t.ownerId||null,category_id:t.categoryId||null,
   deadline:t.deadline||null,priority:t.priority||'mid',
   status:t.status||'bekliyor',done:!!t.done,recurring:!!t.recurring,
   last_renew_month:t.lastRenewMonth||null,image_url:t.imageUrl||null,
@@ -500,7 +500,7 @@ function taskToDb(t){return{
 };}
 function taskFromDb(r){return{
   id:r.id,title:r.title,description:r.description||'',
-  assignees:r.assignees||[],categoryId:r.category_id,
+  assignees:r.assignees||[],ownerId:r.owner_id||null,categoryId:r.category_id,
   deadline:r.deadline,priority:r.priority,status:r.status,
   done:r.done,recurring:r.recurring,lastRenewMonth:r.last_renew_month,
   imageUrl:r.image_url,
@@ -616,8 +616,22 @@ async function loadFromSupabase(){
       await sbUpsert('users',STATE.users.map(userToDb));
     }
 
-    // Tasks — Supabase is single source, no seeding
-    STATE.tasks = tasks&&tasks.length ? tasks.map(taskFromDb) : [];
+    // Tasks
+    if(tasks&&tasks.length){
+      STATE.tasks=tasks.map(taskFromDb);
+    } else {
+      // Seed tasks on first run
+      const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
+      STATE.tasks=[
+        {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
+        {id:'st2',done:false,status:'bekliyor',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro üzerinden export edilmesi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
+        {id:'st3',done:true,status:'tamamlandi',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'SBG proje toplantısı notları',description:'SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
+        {id:'st6',done:false,status:'devam',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
+        {id:'st9',done:false,status:'bekliyor',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,imageUrl:null},
+        {id:'st15',done:false,status:'devam',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
+      ];
+      await sbUpsert('tasks',STATE.tasks.map(taskToDb));
+    }
 
     // Meetings
     STATE.meets=meets?meets.map(meetFromDb):[];
@@ -634,8 +648,12 @@ async function loadFromSupabase(){
 
   } catch(e){
     console.error('Supabase load error:',e);
-    STATE.tasks=[];STATE.users=[...DEFAULT_USERS];STATE.meets=[];STATE.mtasks=[];
-    showToast('⚠ Veritabanına bağlanılamadı','var(--red)');
+    // Fallback to localStorage
+    STATE.tasks=JSON.parse(localStorage.getItem(SK_TASKS)||'[]').map?JSON.parse(localStorage.getItem(SK_TASKS)||'[]'):[];
+    STATE.users=JSON.parse(localStorage.getItem(SK_USERS)||'[]');
+    STATE.meets=JSON.parse(localStorage.getItem(SK_MEETS)||'[]');
+    STATE.mtasks=JSON.parse(localStorage.getItem(SK_MT)||'[]');
+    showToast('⚠ Veritabanına bağlanılamadı, çevrimdışı mod','var(--red)');
   }
   hideLoadingScreen();
   startRealtime();
@@ -1025,7 +1043,7 @@ function taskCardHTML(t,isSubtask){
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
             <div class="tc-title ${st.id==='tamamlandi'||st.id==='iptal'?'done':''}" style="margin-bottom:0">${esc(t.title)}</div>
             <div style="position:relative;flex-shrink:0">
-              <span class="st-badge ${st.cls}" onclick="toggleStDrop('${t.id}')">${st.icon} ${st.label} ▾</span>
+              <span class="st-badge ${st.cls}" onclick="${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'toggleStDrop(\''+t.id+'\')':''}" style="cursor:${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'pointer':'default'}">${st.icon} ${st.label} ${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'▾':''}</span>
               <div class="st-drop" id="std-${t.id}" style="display:none">
                 ${TASK_STATUSES.map(s=>`<div class="st-drop-item" onclick="setTaskStatus('${t.id}','${s.id}')"><span>${s.icon}</span><span>${s.label}</span></div>`).join('')}
               </div>
@@ -1035,6 +1053,7 @@ function taskCardHTML(t,isSubtask){
           ${subtasks.length?`<div class="sub-prog"><div class="sub-prog-fill" style="width:${subPct}%"></div></div>
           <div style="font-size:.65rem;color:var(--text3);margin-top:2px">${subDone}/${subtasks.length} alt görev</div>`:''}
           <div class="tc-meta" style="margin-top:5px">
+            ${(function(){const owner=t.ownerId?gU(t.ownerId):null;return owner?`<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px"><span style="font-size:.62rem;color:var(--gold)">Sorumlu:</span>${avatarHTML(owner,16)}<span style="font-size:.7rem;color:var(--gold);font-weight:600">${esc(owner.name)}</span></div>`:'';})()}
             <div class="atag-row" style="margin-bottom:${assignees.length?'3px':'0'}">${assignees.length?assignees.map(u=>`<span class="atag" style="border-color:${u.role==='patron'?'#9a3412':u.role==='koordinator'?'#1d4ed8':'#15803d'}33">${avatarHTML(u,16)}<span style="font-size:.7rem">${esc(u.name)}</span></span>`).join(''):'<span style="font-size:.68rem;color:var(--text3)">Atanmamış</span>'}</div>
             ${t.deadline?`<span class="tag t-dl ${late?'late':''}">${late?'⚠ ':''}${fmtD(t.deadline)}</span>`:'<span class="tag t-dl" style="opacity:.5">Süresiz</span>'}
             ${cat?`<span class="tag t-cat" style="background:${cat.color}22;color:${cat.color}">${cat.name}</span>`:''}
@@ -1082,6 +1101,9 @@ function toggleStDrop(id){
 }
 function setTaskStatus(id,statusId){
   const t=STATE.tasks.find(x=>x.id===id);if(!t)return;
+  // Patron/koordinatör her görevi, engineer sadece kendi görevini değiştirebilir
+  const canChange=canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id));
+  if(!canChange)return;
   t.status=statusId;t.done=statusId==='tamamlandi';
   svTasks();
   document.querySelectorAll('.st-drop').forEach(x=>x.style.display='none');
@@ -1257,6 +1279,13 @@ function openTaskModal(id,forceRec){
         </select>
       </div>
       <div>
+        <label class="flabel">Sorumlu (Tek Kişi)</label>
+        <select class="finput" id="tm-owner">
+          <option value="">Sorumlu seçin (opsiyonel)</option>
+          ${STATE.users.map(u=>`<option value="${u.id}" ${t&&t.ownerId===u.id?'selected':''}>${esc(u.name)} — ${roleName(u.role)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
         <label class="flabel">Atanacak Kişiler *</label>
         <div class="msel-box">${assignable.map(u=>`
           <div class="ms-opt">
@@ -1307,6 +1336,7 @@ function saveTask(id){
   const data={
     title,description:document.getElementById('tm-d')?.value.trim()||'',
     assignees,
+    ownerId:document.getElementById('tm-owner')?.value||null,
     categoryId:document.getElementById('tm-cat')?.value||null,
     deadline:noDeadline?null:(document.getElementById('tm-dl')?.value||null),
     priority:document.getElementById('tm-p')?.value||'mid',
@@ -2293,8 +2323,6 @@ function deleteUser(id){
 function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 
 // ─── INIT ─────────────────────────────────────────────────────────
-// Temizle: eski localStorage task/user verilerini sil
-['nika_t_v4','nika_mt_v2','nika_users_v1','nika_meets_v1'].forEach(function(k){localStorage.removeItem(k);});
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
