@@ -616,22 +616,8 @@ async function loadFromSupabase(){
       await sbUpsert('users',STATE.users.map(userToDb));
     }
 
-    // Tasks
-    if(tasks&&tasks.length){
-      STATE.tasks=tasks.map(taskFromDb);
-    } else {
-      // Seed tasks on first run
-      const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
-      STATE.tasks=[
-        {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
-        {id:'st2',done:false,status:'bekliyor',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro üzerinden export edilmesi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
-        {id:'st3',done:true,status:'tamamlandi',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'SBG proje toplantısı notları',description:'SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
-        {id:'st6',done:false,status:'devam',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
-        {id:'st9',done:false,status:'bekliyor',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,imageUrl:null},
-        {id:'st15',done:false,status:'devam',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
-      ];
-      await sbUpsert('tasks',STATE.tasks.map(taskToDb));
-    }
+    // Tasks — Supabase is single source, no seeding
+    STATE.tasks = tasks&&tasks.length ? tasks.map(taskFromDb) : [];
 
     // Meetings
     STATE.meets=meets?meets.map(meetFromDb):[];
@@ -648,12 +634,8 @@ async function loadFromSupabase(){
 
   } catch(e){
     console.error('Supabase load error:',e);
-    // Fallback to localStorage
-    STATE.tasks=JSON.parse(localStorage.getItem(SK_TASKS)||'[]').map?JSON.parse(localStorage.getItem(SK_TASKS)||'[]'):[];
-    STATE.users=JSON.parse(localStorage.getItem(SK_USERS)||'[]');
-    STATE.meets=JSON.parse(localStorage.getItem(SK_MEETS)||'[]');
-    STATE.mtasks=JSON.parse(localStorage.getItem(SK_MT)||'[]');
-    showToast('⚠ Veritabanına bağlanılamadı, çevrimdışı mod','var(--red)');
+    STATE.tasks=[];STATE.users=[...DEFAULT_USERS];STATE.meets=[];STATE.mtasks=[];
+    showToast('⚠ Veritabanına bağlanılamadı','var(--red)');
   }
   hideLoadingScreen();
   startRealtime();
@@ -2311,6 +2293,8 @@ function deleteUser(id){
 function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 
 // ─── INIT ─────────────────────────────────────────────────────────
+// Temizle: eski localStorage task/user verilerini sil
+['nika_t_v4','nika_mt_v2','nika_users_v1','nika_meets_v1'].forEach(function(k){localStorage.removeItem(k);});
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
