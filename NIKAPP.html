@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_133207">
+<meta name="version" content="v20260321_135235">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -58,7 +58,7 @@ body{font-family:'Exo 2',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 /* ── TOPBAR ─────────────────────────────────────── */
 .tb-logo{display:flex;align-items:center;gap:10px}
-.tb-logo img{height:32px;filter:drop-shadow(0 0 6px rgba(245,184,14,0.4))}
+.tb-logo img{height:38px}
 .tb-sep{width:1px;height:24px;background:var(--border2);margin:0 4px}
 .tb-title{font-size:.78rem;font-weight:500;color:var(--text2);letter-spacing:.5px}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -224,8 +224,8 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 
 /* ── AUTH ──────────────────────────────────────────── */
 .auth-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(245,184,14,.08) 0,transparent 60%)}
-.auth-logo-wrap{text-align:center;margin-bottom:2rem}
-.auth-logo-wrap img{height:54px;filter:drop-shadow(0 0 14px rgba(245,184,14,.5))}
+.auth-logo-wrap{text-align:center;margin-bottom:2rem;background:transparent}
+.auth-logo-wrap img{height:80px}
 .auth-tagline{font-size:.75rem;color:var(--text3);margin-top:8px;letter-spacing:1px;text-transform:uppercase}
 .auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rxl);padding:2rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 40px rgba(245,184,14,.04)}
 .auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;background:var(--bg2);border-radius:var(--r);padding:3px}
@@ -351,41 +351,6 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .pc-stat-lbl{font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
 .pc-actions{display:flex;gap:6px}
 .pc-actions button{flex:1;padding:6px;font-size:.72rem;border-radius:var(--r);cursor:pointer;font-family:'Exo 2',sans-serif;font-weight:600;transition:all .15s}
-/* ── KATEGORİ FİLTRE BUTONLARI ──────────────────────── */
-.cat-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.cat-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:.75rem;font-weight:600;color:var(--text2);transition:all .15s;white-space:nowrap}
-.cat-pill:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg)}
-.cat-pill.active{color:#080c12;border-color:transparent;font-weight:700}
-.cat-pill .cp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.cat-pill .cp-cnt{background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;font-size:.65rem}
-
-/* ── TASK BOARD VIEW ─────────────────────────────────── */
-.view-toggle{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px}
-.vt-btn{padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:13px;transition:all .15s}
-.vt-btn.active{background:var(--gold);color:#080c12}
-
-/* ── STATUS SÜTUNLARI (Kanban) ───────────────────────── */
-.status-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
-.sb-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;flex-direction:column;min-height:200px}
-.sb-col-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--surface);border-radius:var(--rl) var(--rl) 0 0}
-.sb-col-hdr .sh-icon{font-size:14px}
-.sb-col-hdr .sh-title{font-size:.78rem;font-weight:700;flex:1}
-.sb-col-hdr .sh-cnt{font-size:.68rem;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace}
-.sb-col-body{padding:8px;flex:1;display:flex;flex-direction:column;gap:6px}
-.sb-mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .15s}
-.sb-mini-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.sb-mini-title{font-size:.8rem;font-weight:600;margin-bottom:5px;line-height:1.3}
-.sb-mini-meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-
-/* ── ÖZET STATS ──────────────────────────────────────── */
-.task-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.ts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
-.ts-card:hover{border-color:var(--border2)}
-.ts-card.active{border-color:var(--gold-border);background:var(--gold-bg)}
-.ts-icon{font-size:18px;flex-shrink:0}
-.ts-val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
-.ts-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
-
 /* ── IMG OVERLAY ──────────────────────────────────── */
 .img-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;cursor:pointer;backdrop-filter:blur(4px)}
 .img-ov img{max-width:100%;max-height:90vh;border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -697,7 +662,7 @@ async function loadFromSupabase(){
 function showLoadingScreen(){
   var d=document.createElement('div');d.id='sb-loading';
   d.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
-  d.innerHTML='<img src="'+LOGO+'" style="height:48px;filter:drop-shadow(0 0 12px rgba(245,184,14,.5))"><div style="font-size:.9rem;color:var(--text2)">Yükleniyor...</div><div style="width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div id="sb-bar" style="width:0%;height:100%;background:var(--gold);border-radius:2px;transition:width 1.5s ease"></div></div>';
+  d.innerHTML='<img src="'+LOGO+'" style="height:64px;mix-blend-mode:screen;filter:drop-shadow(0 0 16px rgba(245,184,14,.6)) contrast(1.1)"><div style="font-size:.9rem;color:var(--text2)">Yükleniyor...</div><div style="width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div id="sb-bar" style="width:0%;height:100%;background:var(--gold);border-radius:2px;transition:width 1.5s ease"></div></div>';
   document.body.appendChild(d);
   setTimeout(()=>{var b=document.getElementById('sb-bar');if(b)b.style.width='85%';},100);
 }
@@ -843,7 +808,7 @@ function renderAuth(){
   document.body.innerHTML=`
   <div class="auth-shell">
     <div class="auth-logo-wrap">
-      <img src="${LOGO}" alt="NIKA BIM">
+      <img src="${LOGO}" alt="NIKA BIM" style="height:80px;mix-blend-mode:screen;filter:drop-shadow(0 0 18px rgba(245,184,14,0.6)) contrast(1.1) brightness(1.05)">
       <div class="auth-tagline">İş Takip Yönetim Sistemi</div>
     </div>
     <div class="auth-card">
@@ -915,7 +880,7 @@ function renderShell(){
   document.body.innerHTML=`
   <div class="shell">
     <div class="topbar">
-      <div class="tb-logo"><img src="${LOGO}" alt="NIKA BIM" style="height:30px"></div>
+      <div class="tb-logo"><img src="${LOGO}" alt="NIKA BIM" style="height:38px;mix-blend-mode:screen;filter:drop-shadow(0 0 8px rgba(245,184,14,0.5)) contrast(1.1) brightness(1.05)"></div>
       <div class="tb-sep"></div>
       <div class="tb-title">İş Takip Sistemi</div>
       <div class="tb-right">
@@ -982,72 +947,23 @@ function renderPage(){
 }
 
 // ─── TASKS PAGE ──────────────────────────────────────────────────
-var _taskView = 'list'; // 'list' | 'board'
-
 function renderTasksPage(el,showAll){
-  let allTasks=showAll?STATE.tasks:STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id));
-  allTasks=allTasks.filter(t=>!t.recurring);
-
-  // Stats
-  const total=allTasks.length;
-  const bekliyor=allTasks.filter(t=>!t.done&&(t.status||'bekliyor')==='bekliyor').length;
-  const devam=allTasks.filter(t=>t.status==='devam').length;
-  const tamamlandi=allTasks.filter(t=>t.status==='tamamlandi'||t.done).length;
-  const geciken=allTasks.filter(t=>!t.done&&t.deadline&&isLate(t.deadline)).length;
-
+  let tasks=showAll?STATE.tasks:STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id));
+  tasks=tasks.filter(t=>!t.recurring);
   el.innerHTML=`
   <div class="pg-hdr">
     <div><div class="pg-title">${showAll?'Tüm <span class="hl">Görevler</span>':'<span class="hl">Görevlerim</span>'}</div></div>
-    <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
-      <div class="view-toggle">
-        <button class="vt-btn ${_taskView==='list'?'active':''}" onclick="_taskView='list';renderPage()" title="Liste">☰</button>
-        <button class="vt-btn ${_taskView==='board'?'active':''}" onclick="_taskView='board';renderPage()" title="Kanban">⬡</button>
-      </div>
-      ${canManage(STATE.cu)?`<button class="add-btn" onclick="openTaskModal(null,false)">＋ Görev Ekle</button>`:''}
-    </div>
+    ${canManage(STATE.cu)?`<button class="add-btn" onclick="openTaskModal(null,false)">＋ Görev Ekle</button>`:''}
   </div>
-
-  <div class="task-stats">
-    <div class="ts-card" onclick="setStatFilter('all')">
-      <div class="ts-icon">📋</div>
-      <div><div class="ts-val">${total}</div><div class="ts-lbl">Toplam</div></div>
-    </div>
-    <div class="ts-card" onclick="setStatFilter('devam')">
-      <div class="ts-icon">🔄</div>
-      <div><div class="ts-val" style="color:var(--blue)">${devam}</div><div class="ts-lbl">Devam</div></div>
-    </div>
-    <div class="ts-card" onclick="setStatFilter('bekliyor')">
-      <div class="ts-icon">⏳</div>
-      <div><div class="ts-val" style="color:var(--amber)">${bekliyor}</div><div class="ts-lbl">Bekliyor</div></div>
-    </div>
-    <div class="ts-card" onclick="setStatFilter('geciken')" style="${geciken?'border-color:var(--red-bg)':''}">
-      <div class="ts-icon">⚠</div>
-      <div><div class="ts-val" style="color:var(--red)">${geciken}</div><div class="ts-lbl">Gecikmiş</div></div>
-    </div>
-  </div>
-
-  <div class="cat-filter-row">
-    <div class="cat-pill ${!_activeCat?'active':''}" onclick="setCatFilter(null)" style="${!_activeCat?'background:var(--gold);color:#080c12':''}">
-      <span>Tümü</span>
-      <span class="cp-cnt">${total}</span>
-    </div>
-    ${(function(){return CATEGORIES.map(function(cat){
-      var cnt=allTasks.filter(function(t){return t.categoryId===cat.id;}).length;
-      if(!cnt&&_activeCat!==cat.id)return'';
-      var isAct=_activeCat===cat.id;
-      var st=isAct?'background:'+cat.color+';border-color:'+cat.color:'border-color:'+cat.color+'44;color:'+cat.color;
-      return '<div class="cat-pill '+(isAct?'active':'')+'" onclick="setCatFilter(\''+cat.id+'\')" style="'+st+'">'
-        +'<div class="cp-dot" style="background:'+cat.color+'"></div>'
-        +'<span>'+cat.name+'</span>'
-        +'<span class="cp-cnt">'+cnt+'</span>'
-        +'</div>';
-    }).join('');})()}
-  </div>
-
   <div class="filter-bar">
     <select class="fsel" id="f-stat" onchange="applyFilters()">
       <option value="all">Tüm Durumlar</option>
       ${TASK_STATUSES.map(s=>`<option value="${s.id}">${s.icon} ${s.label}</option>`).join('')}
+    </select>
+    <select class="fsel" id="f-cat" onchange="applyFilters()">
+      <option value="all">Tüm Kategoriler</option>
+      ${CATEGORIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+      <option value="none">Kategorisiz</option>
     </select>
     ${showAll?`<select class="fsel" id="f-ass" onchange="applyFilters()">
       <option value="all">Tüm Kişiler</option>
@@ -1055,88 +971,24 @@ function renderTasksPage(el,showAll){
     </select>`:''}
     <input class="fsearch" id="f-srch" placeholder="Ara..." oninput="applyFilters()">
   </div>
-
-  <div id="task-list">${_taskView==='board'?renderBoardView(allTasks):renderTaskList(allTasks,showAll)}</div>`;
-}
-
-var _activeCat = null;
-var _statFilter = 'all';
-
-function setCatFilter(catId){
-  _activeCat = catId;
-  renderPage();
-}
-
-function setStatFilter(stat){
-  _statFilter = stat;
-  // Set dropdown
-  setTimeout(function(){
-    var el=document.getElementById('f-stat');
-    if(el){
-      if(stat==='geciken')el.value='all';
-      else el.value=stat;
-      applyFilters();
-    }
-  },50);
-  renderPage();
-}
-
-function renderBoardView(tasks){
-  var cols=[
-    {id:'bekliyor',label:'Bekliyor',icon:'⏳',color:'var(--amber)'},
-    {id:'devam',label:'Devam Ediyor',icon:'🔄',color:'var(--blue)'},
-    {id:'tamamlandi',label:'Tamamlandı',icon:'✅',color:'var(--green)'},
-    {id:'iptal',label:'İptal',icon:'🚫',color:'var(--red)'},
-  ];
-  return'<div class="status-board">'+cols.map(function(col){
-    var colTasks=tasks.filter(function(t){
-      var st=t.status||'bekliyor';
-      if(col.id==='tamamlandi')return st==='tamamlandi'||t.done;
-      return st===col.id&&!t.done;
-    });
-    if(_activeCat)colTasks=colTasks.filter(function(t){return t.categoryId===_activeCat;});
-    return'<div class="sb-col">'+
-      '<div class="sb-col-hdr">'+
-        '<span class="sh-icon">'+col.icon+'</span>'+
-        '<span class="sh-title" style="color:'+col.color+'">'+col.label+'</span>'+
-        '<span class="sh-cnt">'+colTasks.length+'</span>'+
-      '</div>'+
-      '<div class="sb-col-body">'+
-        colTasks.map(function(t){
-          var assignees=(t.assignees||[]).map(gU).filter(Boolean);
-          var cat=getCat(t.categoryId);
-          var late=!t.done&&t.deadline&&isLate(t.deadline);
-          return'<div class="sb-mini-card" onclick="openTaskModal(\''+t.id+'\',false)">'+
-            '<div class="pbar pb-'+(t.priority==='high'?'h':t.priority==='low'?'l':'m')+'" style="height:2px;width:100%;margin-bottom:7px;border-radius:2px"></div>'+
-            '<div class="sb-mini-title">'+esc(t.title)+'</div>'+
-            '<div class="sb-mini-meta">'+
-              (cat?'<span class="tag t-cat" style="background:'+cat.color+'22;color:'+cat.color+'">'+cat.name+'</span>':'')+
-              (t.deadline?'<span class="tag t-dl '+(late?'late':'')+'">'+fmtD(t.deadline)+'</span>':'')+
-              '<div style="display:flex;margin-left:auto">'+
-                assignees.slice(0,3).map(function(u){return avatarHTML(u,18);}).join('')+
-              '</div>'+
-            '</div>'+
-          '</div>';
-        }).join('')+
-        (canManage(STATE.cu)?'<button class="mt-add-card" onclick="openTaskModal(null,false)">＋ Ekle</button>':'')+
-      '</div>'+
-    '</div>';
-  }).join('')+'</div>';
+  <div id="task-list">${renderTaskList(tasks,showAll)}</div>`;
 }
 
 function applyFilters(){
   const stat=document.getElementById('f-stat')?.value||'all';
+  const cat=document.getElementById('f-cat')?.value||'all';
   const ass=document.getElementById('f-ass')?.value||'all';
   const srch=(document.getElementById('f-srch')?.value||'').toLowerCase();
   const showAll=STATE.page==='all-tasks';
   let tasks=showAll?STATE.tasks:STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id));
   tasks=tasks.filter(t=>!t.recurring);
   if(stat!=='all')tasks=tasks.filter(t=>(t.status||'bekliyor')===stat||(stat==='tamamlandi'&&t.done));
-  if(_activeCat)tasks=tasks.filter(t=>t.categoryId===_activeCat);
+  if(cat==='none')tasks=tasks.filter(t=>!t.categoryId);
+  else if(cat!=='all')tasks=tasks.filter(t=>t.categoryId===cat);
   if(ass!=='all')tasks=tasks.filter(t=>t.assignees&&t.assignees.includes(ass));
   if(srch)tasks=tasks.filter(t=>(t.title||'').toLowerCase().includes(srch)||(t.description||'').toLowerCase().includes(srch));
   const tl=document.getElementById('task-list');
-  if(tl)tl.innerHTML=_taskView==='board'?renderBoardView(tasks):renderTaskList(tasks,showAll);
+  if(tl)tl.innerHTML=renderTaskList(tasks,showAll);
 }
 
 function renderTaskList(tasks,showAll){
@@ -2567,19 +2419,7 @@ function stopModalRec(){
     return 'Sen NIKA BIM & DC Management sirketinin AI asistanisin. Turkce yanitla. Bugun: '+today+'.\n\nEKIP: '+(users||'Kayitli kullanici yok.')+'\n\nKATEGORILER: '+catLines+'\n\nGOREVLER ('+STATE.tasks.length+' toplam):\n'+(taskLines||'Gorev yok.')+'\n\nMULTI-TASK PANOLAR:\n'+(boardLines||'Pano yok.')+'\n\nKullanici sorularinda bu verileri kullan. Analiz, ozet ve oneri sunabilirsin.';
   }
 
-  var GROQ_KEY='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';
   function callClaude(messages, system, cb){
-    var msgs=[{role:'system',content:system}].concat(messages);
-    fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,messages:msgs})
-    }).then(function(r){return r.json()}).then(function(d){
-      if(d.error)cb(null,d.error.message);
-      else cb((d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'',null);
-    }).catch(function(e){cb(null,e.message);});
-  }
-  function callClaude_OLD(messages, system, cb){
     fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
