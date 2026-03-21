@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_132541">
+<meta name="version" content="v20260321_133207">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1031,16 +1031,17 @@ function renderTasksPage(el,showAll){
       <span>Tümü</span>
       <span class="cp-cnt">${total}</span>
     </div>
-    ${CATEGORIES.map(cat=>{
-      const cnt=allTasks.filter(t=>t.categoryId===cat.id).length;
+    ${(function(){return CATEGORIES.map(function(cat){
+      var cnt=allTasks.filter(function(t){return t.categoryId===cat.id;}).length;
       if(!cnt&&_activeCat!==cat.id)return'';
-      return\`<div class="cat-pill \${_activeCat===cat.id?'active':''}" onclick="setCatFilter('\${cat.id}')"
-        style="\${_activeCat===cat.id?'background:'+cat.color+';border-color:'+cat.color:'border-color:'+cat.color+'44;color:'+cat.color}">
-        <div class="cp-dot" style="background:\${cat.color}"></div>
-        <span>\${cat.name}</span>
-        <span class="cp-cnt">\${cnt}</span>
-      </div>\`;
-    }).join('')}
+      var isAct=_activeCat===cat.id;
+      var st=isAct?'background:'+cat.color+';border-color:'+cat.color:'border-color:'+cat.color+'44;color:'+cat.color;
+      return '<div class="cat-pill '+(isAct?'active':'')+'" onclick="setCatFilter(\''+cat.id+'\')" style="'+st+'">'
+        +'<div class="cp-dot" style="background:'+cat.color+'"></div>'
+        +'<span>'+cat.name+'</span>'
+        +'<span class="cp-cnt">'+cnt+'</span>'
+        +'</div>';
+    }).join('');})()}
   </div>
 
   <div class="filter-bar">
