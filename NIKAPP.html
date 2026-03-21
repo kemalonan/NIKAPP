@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_122836">
+<meta name="version" content="v20260321_123144">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -617,22 +617,8 @@ async function loadFromSupabase(){
     }
 
     // Tasks
-    if(tasks&&tasks.length){
-      STATE.tasks=tasks.map(taskFromDb);
-    } else {
-      // Seed tasks on first run
-      const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
-      STATE.tasks=[
-        {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
-        {id:'st2',done:false,status:'bekliyor',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro üzerinden export edilmesi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
-        {id:'st3',done:true,status:'tamamlandi',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'SBG proje toplantısı notları',description:'SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
-        {id:'st6',done:false,status:'devam',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
-        {id:'st9',done:false,status:'bekliyor',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,imageUrl:null},
-        {id:'st15',done:false,status:'devam',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
-      ];
-      await sbUpsert('tasks',STATE.tasks.map(taskToDb));
-    }
-
+    // Tasks — Supabase single source, no seeding
+    STATE.tasks = (tasks&&tasks.length) ? tasks.map(taskFromDb) : [];
     // Meetings
     STATE.meets=meets?meets.map(meetFromDb):[];
 
@@ -698,28 +684,6 @@ const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v)); // kept for planner/s
   const existing = JSON.parse(localStorage.getItem('nika_users_v1')||'[]');
   if(!existing.length){
     localStorage.setItem('nika_users_v1', JSON.stringify(DEFAULT_USERS));
-  }
-  const existingTasks = JSON.parse(localStorage.getItem('nika_t_v4')||'[]');
-  if(!existingTasks.length){
-    const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
-    const SEED_TASKS=[
-      {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null,createdAt:new Date().toISOString()},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null,createdAt:new Date().toISOString()},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null,createdAt:new Date().toISOString()}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
-      {id:'st2',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro uzerinden export edilmesi ve sunuma hazirlanmasi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
-      {id:'st3',done:true,status:"tamamlandi",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'SBG proje toplantısı notları',description:'Geçen haftaki SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st4',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Unreal Engine sahne optimizasyonu',description:'YILDIZLAR projesi için hazırlanan Unreal sahnesinin render performansının iyileştirilmesi.',assignees:['u_e4'],categoryId:'unreal',deadline:d(10),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st5',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'OpenSpace 360° tarama yükleme',description:'Şantiye taramalarının OpenSpace platformuna yüklenmesi ve etiketlenmesi.',assignees:['u_e1'],categoryId:'openspace',deadline:d(7),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st6',done:false,status:"devam",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
-      {id:'st7',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Synchro 4D lisans yenileme takibi',description:'Mevcut lisansların son kullanma tarihleri kontrol edilip yenileme süreci başlatılacak.',assignees:['u_k2'],categoryId:'synchro4d',deadline:d(15),priority:'low',recurring:false,imageUrl:null},
-      {id:'st8',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Ofis fatura ve gider takibi',description:'Mart ayı ofis giderlerinin muhasebe sistemine işlenmesi.',assignees:['u_k1'],categoryId:'ofis',deadline:d(4),priority:'low',recurring:false,imageUrl:null},
-      {id:'st9',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,lastRenewMonth:'2026-03',imageUrl:null},
-      {id:'st10',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Aylık lisans kullanım raporu',description:'Tüm yazılım lisanslarının aylık kullanım istatistiklerinin derlenmesi.',assignees:['u_k2'],categoryId:'synchro4d',deadline:null,priority:'low',recurring:true,lastRenewMonth:'2026-03',imageUrl:null},
-      {id:'st11',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'YILDIZLAR 3D görselleştirme revizyonu',description:'Müşteri geri bildirimleri doğrultusunda render çıktılarının revize edilmesi.',assignees:['u_e4','u_e1'],categoryId:'yildizlar',deadline:d(8),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st12',done:true,status:"tamamlandi",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'EIB clash detection analizi',description:'EIB projesinde MEP ile yapısal elemanlar arasındaki çakışmaların tespiti.',assignees:['u_e3'],categoryId:'eib',deadline:d(-5),priority:'high',recurring:false,imageUrl:null},
-      {id:'st13',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c3',userId:'u_e2',text:'Sahaya gidip ölçüm alacağım yarın.',at:new Date().toISOString()},{id:'c4',userId:'u_k1',text:'Ekipmana dikkat et, yağmur var.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'SBG sahne ölçüm ve kontrol',description:'SBG şantiyesinde mevcut imalatların Revit modeli ile karşılaştırılması.',assignees:['u_e2'],categoryId:'sbg',deadline:d(1),priority:'high',recurring:false,imageUrl:null},
-      {id:'st14',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'OpenSpace tarama takvimi güncelleme',description:'Gelecek ay yapılacak 360° taramaların takviminin oluşturulması.',assignees:['u_e1'],categoryId:'openspace',deadline:d(12),priority:'low',recurring:false,imageUrl:null},
-      {id:'st15',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
-    ];
-    localStorage.setItem('nika_t_v4', JSON.stringify(SEED_TASKS));
   }
 })();
 const gS=()=>{try{return JSON.parse(sessionStorage.getItem(SK_SESS))}catch{return null}};
@@ -2362,6 +2326,8 @@ function deleteUser(id){
 function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 
 // ─── INIT ─────────────────────────────────────────────────────────
+// Eski localStorage verilerini temizle
+['nika_t_v4','nika_mt_v2','nika_users_v1','nika_meets_v1'].forEach(function(k){localStorage.removeItem(k);});
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
