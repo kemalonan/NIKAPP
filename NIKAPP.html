@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260320_204248">
+<meta name="version" content="v20260321_122836">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -489,7 +489,7 @@ async function sbDelete(table, id){
 // ─── DB ↔ STATE MAPPERS ──────────────────────────────────────────
 function taskToDb(t){return{
   id:t.id,title:t.title,description:t.description||'',
-  assignees:t.assignees||[],owner_id:t.ownerId||null,category_id:t.categoryId||null,
+  assignees:t.assignees||[],category_id:t.categoryId||null,
   deadline:t.deadline||null,priority:t.priority||'mid',
   status:t.status||'bekliyor',done:!!t.done,recurring:!!t.recurring,
   last_renew_month:t.lastRenewMonth||null,image_url:t.imageUrl||null,
@@ -500,7 +500,7 @@ function taskToDb(t){return{
 };}
 function taskFromDb(r){return{
   id:r.id,title:r.title,description:r.description||'',
-  assignees:r.assignees||[],ownerId:r.owner_id||null,categoryId:r.category_id,
+  assignees:r.assignees||[],categoryId:r.category_id,
   deadline:r.deadline,priority:r.priority,status:r.status,
   done:r.done,recurring:r.recurring,lastRenewMonth:r.last_renew_month,
   imageUrl:r.image_url,
@@ -616,8 +616,22 @@ async function loadFromSupabase(){
       await sbUpsert('users',STATE.users.map(userToDb));
     }
 
-    // Tasks — Supabase is single source of truth, NO seeding
-    STATE.tasks = (tasks&&tasks.length) ? tasks.map(taskFromDb) : [];
+    // Tasks
+    if(tasks&&tasks.length){
+      STATE.tasks=tasks.map(taskFromDb);
+    } else {
+      // Seed tasks on first run
+      const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
+      STATE.tasks=[
+        {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
+        {id:'st2',done:false,status:'bekliyor',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro üzerinden export edilmesi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
+        {id:'st3',done:true,status:'tamamlandi',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'SBG proje toplantısı notları',description:'SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
+        {id:'st6',done:false,status:'devam',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
+        {id:'st9',done:false,status:'bekliyor',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,imageUrl:null},
+        {id:'st15',done:false,status:'devam',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
+      ];
+      await sbUpsert('tasks',STATE.tasks.map(taskToDb));
+    }
 
     // Meetings
     STATE.meets=meets?meets.map(meetFromDb):[];
@@ -1029,7 +1043,7 @@ function taskCardHTML(t,isSubtask){
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
             <div class="tc-title ${st.id==='tamamlandi'||st.id==='iptal'?'done':''}" style="margin-bottom:0">${esc(t.title)}</div>
             <div style="position:relative;flex-shrink:0">
-              <span class="st-badge ${st.cls}" onclick="${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'toggleStDrop(\''+t.id+'\')':''}" style="cursor:${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'pointer':'default'}">${st.icon} ${st.label} ${canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id))?'▾':''}</span>
+              <span class="st-badge ${st.cls}" onclick="toggleStDrop('${t.id}')">${st.icon} ${st.label} ▾</span>
               <div class="st-drop" id="std-${t.id}" style="display:none">
                 ${TASK_STATUSES.map(s=>`<div class="st-drop-item" onclick="setTaskStatus('${t.id}','${s.id}')"><span>${s.icon}</span><span>${s.label}</span></div>`).join('')}
               </div>
@@ -1039,7 +1053,6 @@ function taskCardHTML(t,isSubtask){
           ${subtasks.length?`<div class="sub-prog"><div class="sub-prog-fill" style="width:${subPct}%"></div></div>
           <div style="font-size:.65rem;color:var(--text3);margin-top:2px">${subDone}/${subtasks.length} alt görev</div>`:''}
           <div class="tc-meta" style="margin-top:5px">
-            ${(function(){const owner=t.ownerId?gU(t.ownerId):null;return owner?`<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px"><span style="font-size:.62rem;color:var(--gold)">Sorumlu:</span>${avatarHTML(owner,16)}<span style="font-size:.7rem;color:var(--gold);font-weight:600">${esc(owner.name)}</span></div>`:'';})()}
             <div class="atag-row" style="margin-bottom:${assignees.length?'3px':'0'}">${assignees.length?assignees.map(u=>`<span class="atag" style="border-color:${u.role==='patron'?'#9a3412':u.role==='koordinator'?'#1d4ed8':'#15803d'}33">${avatarHTML(u,16)}<span style="font-size:.7rem">${esc(u.name)}</span></span>`).join(''):'<span style="font-size:.68rem;color:var(--text3)">Atanmamış</span>'}</div>
             ${t.deadline?`<span class="tag t-dl ${late?'late':''}">${late?'⚠ ':''}${fmtD(t.deadline)}</span>`:'<span class="tag t-dl" style="opacity:.5">Süresiz</span>'}
             ${cat?`<span class="tag t-cat" style="background:${cat.color}22;color:${cat.color}">${cat.name}</span>`:''}
@@ -1087,9 +1100,6 @@ function toggleStDrop(id){
 }
 function setTaskStatus(id,statusId){
   const t=STATE.tasks.find(x=>x.id===id);if(!t)return;
-  // Patron/koordinatör her görevi, engineer sadece kendi görevini değiştirebilir
-  const canChange=canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id));
-  if(!canChange)return;
   t.status=statusId;t.done=statusId==='tamamlandi';
   svTasks();
   document.querySelectorAll('.st-drop').forEach(x=>x.style.display='none');
@@ -1265,13 +1275,6 @@ function openTaskModal(id,forceRec){
         </select>
       </div>
       <div>
-        <label class="flabel">Sorumlu (Tek Kişi)</label>
-        <select class="finput" id="tm-owner">
-          <option value="">Sorumlu seçin (opsiyonel)</option>
-          ${STATE.users.map(u=>`<option value="${u.id}" ${t&&t.ownerId===u.id?'selected':''}>${esc(u.name)} — ${roleName(u.role)}</option>`).join('')}
-        </select>
-      </div>
-      <div>
         <label class="flabel">Atanacak Kişiler *</label>
         <div class="msel-box">${assignable.map(u=>`
           <div class="ms-opt">
@@ -1322,7 +1325,6 @@ function saveTask(id){
   const data={
     title,description:document.getElementById('tm-d')?.value.trim()||'',
     assignees,
-    ownerId:document.getElementById('tm-owner')?.value||null,
     categoryId:document.getElementById('tm-cat')?.value||null,
     deadline:noDeadline?null:(document.getElementById('tm-dl')?.value||null),
     priority:document.getElementById('tm-p')?.value||'mid',
@@ -1336,19 +1338,70 @@ function saveTask(id){
 }
 
 // ─── NOTIFICATION SIMULATION ─────────────────────────────────────
-function simulateNotif(task){
-  if(!task.deadline)return;
-  const u=STATE.cu;
-  if(!u.notifEmail&&!u.notifTeams)return;
-  const msg=`📧 Simülasyon: "${task.title}" görevi oluşturuldu. Deadline: ${fmtD(task.deadline)}
-Gerçek sistemde e-posta (${u.email}) ve Teams bildirimi gönderilecek.`;
-  setTimeout(()=>{
-    const notifBox=document.createElement('div');
-    notifBox.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--gold-border);border-radius:var(--r);padding:14px 16px;max-width:320px;z-index:999;font-size:.78rem;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.3)';
-    notifBox.innerHTML=`<div style="color:var(--gold);font-weight:700;margin-bottom:4px">📬 Bildirim Simülasyonu</div><div style="color:var(--text2)">${esc(msg)}</div><div style="text-align:right;margin-top:8px"><button onclick="this.closest('div').remove()" style="padding:4px 10px;background:var(--gold);color:#080c12;border:none;border-radius:5px;cursor:pointer;font-size:.72rem">Tamam</button></div>`;
-    document.body.appendChild(notifBox);
-    setTimeout(()=>notifBox.remove(),8000);
-  },300);
+// ─── BİLDİRİM SİSTEMİ ───────────────────────────────────────────
+const RESEND_KEY='re_cfNSmZMn_7tzVmTNmK7UKLHom4NzNajhK';
+const TEAMS_WEBHOOK='https://defaultdb5fdbcec75a452db183c6bbb28b58.6a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d1c2ebac86ff44faa3ecf54d0281b6b7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=k2KCGYBwbsZDrk1k_9Qq8p-e2_6RUhKX2mKA8G9WklI';
+
+async function sendMail(toEmail,toName,subject,taskTitle,taskDesc,deadline,assignerName){
+  try{
+    await fetch('https://cxhiaqdxfyloxsqcvkyf.supabase.co/functions/v1/send-email',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4aGlhcWR4Znlsb3hzcWN2a3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzQ2MTQsImV4cCI6MjA4OTUxMDYxNH0.8mG3vFFvTir8FvbQVteEJY02SHVYdeUs3Ct0aIrqdgs'},
+      body:JSON.stringify({to:toEmail,toName:toName,subject:subject,taskTitle:taskTitle,taskDesc:taskDesc,deadline:deadline,assignerName:assignerName})
+    });
+  }catch(e){console.error('Mail error:',e);}
+}
+
+async function sendTeams(taskTitle,taskDesc,deadline,assignerName,assigneeNames){
+  try{
+    await fetch(TEAMS_WEBHOOK,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        type:'message',
+        attachments:[{
+          contentType:'application/vnd.microsoft.card.adaptive',
+          content:{
+            type:'AdaptiveCard',
+            version:'1.4',
+            body:[
+              {type:'TextBlock',text:'🔔 Yeni Görev: '+taskTitle,weight:'Bolder',size:'Medium',color:'Warning'},
+              {type:'FactSet',facts:[
+                {title:'Atanan',value:assigneeNames},
+                {title:'Atayan',value:assignerName},
+                {title:'Deadline',value:deadline||'Süresiz'},
+                {title:'Açıklama',value:taskDesc||'—'}
+              ]},
+              {type:'ActionSet',actions:[{type:'Action.OpenUrl',title:'Görevi Aç',url:'https://nikapp.vercel.app/NIKAPP.html'}]}
+            ]
+          }
+        }]
+      })
+    });
+  }catch(e){console.error('Teams error:',e);}
+}
+
+async function simulateNotif(task){
+  var assignerName=STATE.cu?STATE.cu.name:'Sistem';
+  var dl=task.deadline?fmtD(task.deadline):'Süresiz';
+  var assigneeIds=task.assignees||[];
+  var assigneeNames=assigneeIds.map(function(id){var u=STATE.users.find(function(x){return x.id===id;});return u?u.name:id;}).join(', ');
+
+  // Teams kanalına tek mesaj gönder (herkesi kapsıyor)
+  await sendTeams(task.title,task.description||'',dl,assignerName,assigneeNames);
+
+  // Her atanan kişiye mail gönder
+  var mailCount=0;
+  for(var i=0;i<assigneeIds.length;i++){
+    var u=STATE.users.find(function(x){return x.id===assigneeIds[i];});
+    if(u&&u.email&&u.notifEmail){
+      await sendMail(u.email,u.name,'[NIKA BIM] Yeni Görev: '+task.title,task.title,task.description||'',dl,assignerName);
+      mailCount++;
+    }
+  }
+
+  showToast('📬 Teams bildirimi gönderildi'+(mailCount?' · '+mailCount+' mail':''));
 }
 
 // ─── CATEGORIES PAGE ──────────────────────────────────────────────
