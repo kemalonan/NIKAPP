@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_135235">
+<meta name="version" content="v20260321_171152">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -427,13 +427,77 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .va-retry:hover{border-color:var(--gold-border);color:var(--gold)}
 .ai-tip{font-size:.7rem;color:var(--text3);padding:8px 10px;background:var(--bg3);border-radius:var(--r);border-left:2px solid var(--gold);line-height:1.5}
 @media(max-width:480px){.ai-panel{width:calc(100vw - 32px);right:16px}}
+
+/* ── TOOLTIP */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2540;color:#dde6f5;font-size:.68rem;padding:5px 9px;border-radius:6px;z-index:9999;border:1px solid #243352;pointer-events:none;max-width:200px;white-space:normal;text-align:center;line-height:1.4}
+[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#243352;z-index:9999;pointer-events:none}
+/* ── BLUEPRINT */
+.bp-wrap{width:100%;overflow:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.bp-canvas{position:relative;min-width:800px;min-height:400px}
+.bp-node{position:absolute;background:var(--surface);border:2px solid var(--border2);border-radius:var(--r);padding:12px 14px;min-width:160px;cursor:pointer;transition:border-color .15s;z-index:10}
+.bp-node:hover{border-color:var(--gold-border)}
+.bp-node.bp-done{border-color:var(--green);opacity:.7}
+.bp-node.bp-active{border-color:var(--blue)}
+.bp-node-title{font-size:.78rem;font-weight:700;margin-bottom:4px}
+.bp-node-meta{font-size:.65rem;color:var(--text3)}
+svg.bp-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}
+/* ── CAT PILLS */
+.cat-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:.75rem;font-weight:600;color:var(--text2);transition:all .15s;white-space:nowrap}
+.cat-pill:hover{border-color:var(--gold-border);color:var(--gold)}
+.cat-pill.active{color:#080c12;border-color:transparent;font-weight:700}
+.cat-pill .cp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cat-pill .cp-cnt{background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:10px;font-size:.65rem}
+/* ── VIEW TOGGLE */
+.view-toggle{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px}
+.vt-btn{padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:13px;transition:all .15s;font-family:inherit}
+.vt-btn.active{background:var(--gold);color:#080c12}
+/* ── TASK STATS */
+.task-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
+.ts-card:hover{border-color:var(--border2)}
+.ts-icon{font-size:18px;flex-shrink:0}
+.ts-val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
+.ts-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+/* ── STATUS BOARD */
+.status-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-bottom:8px}
+.sb-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;flex-direction:column;min-height:200px}
+.sb-col-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sh-title{font-size:.78rem;font-weight:700;flex:1}
+.sh-cnt{font-size:.68rem;background:var(--bg3);color:var(--text3);padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.sb-col-body{padding:8px;flex:1;display:flex;flex-direction:column;gap:6px}
+.sb-mini-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .15s}
+.sb-mini-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.sb-mini-title{font-size:.8rem;font-weight:600;margin-bottom:5px}
+.sb-mini-meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+/* ── CALENDAR */
+.meet-view-tabs{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:16px;width:fit-content}
+.mvt{padding:6px 14px;border-radius:5px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:.78rem;font-weight:600;font-family:inherit;transition:all .15s}
+.mvt.active{background:var(--gold);color:#080c12}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px}
+.cal-hdr{text-align:center;font-size:.65rem;font-weight:700;color:var(--text3);padding:6px 0;text-transform:uppercase;letter-spacing:.5px}
+.cal-day{min-height:80px;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:4px;cursor:pointer;transition:all .15s;position:relative}
+.cal-day:hover{border-color:var(--border2)}
+.cal-day.today{border-color:var(--gold-border);background:var(--gold-bg)}
+.cal-day.other-month{opacity:.3;pointer-events:none}
+.cal-day.has-meet{border-color:rgba(56,189,248,.5)}
+.cal-day-num{font-size:.72rem;font-weight:700;margin-bottom:3px;color:var(--text2)}
+.cal-day.today .cal-day-num{color:var(--gold)}
+.cal-meet-chip{background:var(--blue);color:#fff;font-size:.58rem;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:block}
+.cal-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.cal-nav h3{font-size:.9rem;font-weight:700;flex:1;text-align:center}
+/* ── COLOR PICKER */
+.color-pick{display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r)}
+.cp-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.cp-swatch.sel{border-color:white;transform:scale(1.2)}
 </style>
 </head>
 <body>
 <script>
 // ─── CONSTANTS ─────────────────────────────────────────────────
 const LOGO = "data:image/jpeg;base64,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";
-const CATEGORIES = [
+const DEFAULT_CATEGORIES=[
   {id:'sbg',name:'SBG',color:'#f97316'},
   {id:'eib',name:'EIB',color:'#38bdf8'},
   {id:'unreal',name:'UNREAL',color:'#a855f7'},
@@ -443,6 +507,9 @@ const CATEGORIES = [
   {id:'synchro4d',name:'SYNCHRO 4D LISANS',color:'#f5b80e'},
   {id:'ofis',name:'OFİS İŞLERİ',color:'#94a3b8'},
 ];
+function loadCats(){try{var s=localStorage.getItem('nika_cats_custom');return s?JSON.parse(s):[...DEFAULT_CATEGORIES];}catch{return[...DEFAULT_CATEGORIES];}}
+function saveCats(cats){localStorage.setItem('nika_cats_custom',JSON.stringify(cats));}
+var CATEGORIES=loadCats();
 const TASK_STATUSES=[
   {id:'bekliyor',label:'Bekliyor',icon:'⏳',cls:'st-bekliyor'},
   {id:'devam',label:'Devam Ediyor',icon:'🔄',cls:'st-devam'},
@@ -616,22 +683,8 @@ async function loadFromSupabase(){
       await sbUpsert('users',STATE.users.map(userToDb));
     }
 
-    // Tasks
-    if(tasks&&tasks.length){
-      STATE.tasks=tasks.map(taskFromDb);
-    } else {
-      // Seed tasks on first run
-      const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
-      STATE.tasks=[
-        {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
-        {id:'st2',done:false,status:'bekliyor',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro üzerinden export edilmesi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
-        {id:'st3',done:true,status:'tamamlandi',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'SBG proje toplantısı notları',description:'SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
-        {id:'st6',done:false,status:'devam',subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
-        {id:'st9',done:false,status:'bekliyor',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,imageUrl:null},
-        {id:'st15',done:false,status:'devam',subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
-      ];
-      await sbUpsert('tasks',STATE.tasks.map(taskToDb));
-    }
+    // Tasks — Supabase single source
+    STATE.tasks = (tasks&&tasks.length) ? tasks.map(taskFromDb) : [];
 
     // Meetings
     STATE.meets=meets?meets.map(meetFromDb):[];
@@ -698,28 +751,6 @@ const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v)); // kept for planner/s
   const existing = JSON.parse(localStorage.getItem('nika_users_v1')||'[]');
   if(!existing.length){
     localStorage.setItem('nika_users_v1', JSON.stringify(DEFAULT_USERS));
-  }
-  const existingTasks = JSON.parse(localStorage.getItem('nika_t_v4')||'[]');
-  if(!existingTasks.length){
-    const d=(offset)=>{const dt=new Date();dt.setDate(dt.getDate()+offset);return dt.toISOString().slice(0,10);};
-    const SEED_TASKS=[
-      {id:'st1',done:false,status:'devam',subtasks:[{id:'ss1',title:'Zemin kat güncelleme',done:true,assigneeId:'u_e1',deadline:null,createdAt:new Date().toISOString()},{id:'ss2',title:'1-5 kat modelleme',done:false,assigneeId:'u_e2',deadline:null,createdAt:new Date().toISOString()},{id:'ss3',title:'LOD 350 kontrol',done:false,assigneeId:'u_e1',deadline:null,createdAt:new Date().toISOString()}],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'EKGYO Block 6 Revit modeli güncelleme',description:'Block 6 için tüm katların Revit modelinin LOD 350 seviyesine getirilmesi.',assignees:['u_e1','u_e2'],categoryId:'eib',deadline:d(5),priority:'high',recurring:false,imageUrl:null},
-      {id:'st2',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Synchro 4D simülasyon raporu hazırlama',description:'Q2 için inşaat simülasyon raporunun Synchro uzerinden export edilmesi ve sunuma hazirlanmasi.',assignees:['u_e3'],categoryId:'synchro4d',deadline:d(3),priority:'high',recurring:false,imageUrl:null},
-      {id:'st3',done:true,status:"tamamlandi",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c1',userId:'u_e2',text:'Tamamlandı, rapor paylaşıldı.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'SBG proje toplantısı notları',description:'Geçen haftaki SBG koordinasyon toplantısının notlarının derlenmesi.',assignees:['u_k1'],categoryId:'sbg',deadline:d(-2),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st4',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Unreal Engine sahne optimizasyonu',description:'YILDIZLAR projesi için hazırlanan Unreal sahnesinin render performansının iyileştirilmesi.',assignees:['u_e4'],categoryId:'unreal',deadline:d(10),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st5',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'OpenSpace 360° tarama yükleme',description:'Şantiye taramalarının OpenSpace platformuna yüklenmesi ve etiketlenmesi.',assignees:['u_e1'],categoryId:'openspace',deadline:d(7),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st6',done:false,status:"devam",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[{id:'c2',userId:'u_k1',text:'Bu hafta mutlaka bitirelim, sunum var.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'Emlakkonut BIM koordinasyon raporu',description:'Emlakkonut projesi için aylık BIM koordinasyon raporunun hazırlanması.',assignees:['u_e2','u_e3'],categoryId:'emlakkonut',deadline:d(2),priority:'high',recurring:false,imageUrl:null},
-      {id:'st7',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Synchro 4D lisans yenileme takibi',description:'Mevcut lisansların son kullanma tarihleri kontrol edilip yenileme süreci başlatılacak.',assignees:['u_k2'],categoryId:'synchro4d',deadline:d(15),priority:'low',recurring:false,imageUrl:null},
-      {id:'st8',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Ofis fatura ve gider takibi',description:'Mart ayı ofis giderlerinin muhasebe sistemine işlenmesi.',assignees:['u_k1'],categoryId:'ofis',deadline:d(4),priority:'low',recurring:false,imageUrl:null},
-      {id:'st9',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Haftalık ekip durum raporu',description:'Her pazartesi ekip çalışmalarının özetinin hazırlanıp patrona sunulması.',assignees:['u_k1','u_k2'],categoryId:'ofis',deadline:null,priority:'mid',recurring:true,lastRenewMonth:'2026-03',imageUrl:null},
-      {id:'st10',done:false,status:"bekliyor",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Aylık lisans kullanım raporu',description:'Tüm yazılım lisanslarının aylık kullanım istatistiklerinin derlenmesi.',assignees:['u_k2'],categoryId:'synchro4d',deadline:null,priority:'low',recurring:true,lastRenewMonth:'2026-03',imageUrl:null},
-      {id:'st11',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'YILDIZLAR 3D görselleştirme revizyonu',description:'Müşteri geri bildirimleri doğrultusunda render çıktılarının revize edilmesi.',assignees:['u_e4','u_e1'],categoryId:'yildizlar',deadline:d(8),priority:'mid',recurring:false,imageUrl:null},
-      {id:'st12',done:true,status:"tamamlandi",subtasks:[],createdBy:'u_k2',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'EIB clash detection analizi',description:'EIB projesinde MEP ile yapısal elemanlar arasındaki çakışmaların tespiti.',assignees:['u_e3'],categoryId:'eib',deadline:d(-5),priority:'high',recurring:false,imageUrl:null},
-      {id:'st13',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[{id:'c3',userId:'u_e2',text:'Sahaya gidip ölçüm alacağım yarın.',at:new Date().toISOString()},{id:'c4',userId:'u_k1',text:'Ekipmana dikkat et, yağmur var.',at:new Date().toISOString()}],files:[],lastRenewMonth:'2026-03',title:'SBG sahne ölçüm ve kontrol',description:'SBG şantiyesinde mevcut imalatların Revit modeli ile karşılaştırılması.',assignees:['u_e2'],categoryId:'sbg',deadline:d(1),priority:'high',recurring:false,imageUrl:null},
-      {id:'st14',done:false,status:"bekliyor",subtasks:[],createdBy:'u_k1',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'OpenSpace tarama takvimi güncelleme',description:'Gelecek ay yapılacak 360° taramaların takviminin oluşturulması.',assignees:['u_e1'],categoryId:'openspace',deadline:d(12),priority:'low',recurring:false,imageUrl:null},
-      {id:'st15',done:false,status:"devam",subtasks:[],createdBy:'u_patron',createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:'2026-03',title:'Emlakkonut sunum dosyası hazırlama',description:'Emlakkonut yönetimine sunulacak Q1 ilerleme sunumunun hazırlanması.',assignees:['u_k1','u_e3','u_e4'],categoryId:'emlakkonut',deadline:d(6),priority:'high',recurring:false,imageUrl:null},
-    ];
-    localStorage.setItem('nika_t_v4', JSON.stringify(SEED_TASKS));
   }
 })();
 const gS=()=>{try{return JSON.parse(sessionStorage.getItem(SK_SESS))}catch{return null}};
@@ -947,48 +978,96 @@ function renderPage(){
 }
 
 // ─── TASKS PAGE ──────────────────────────────────────────────────
+var _taskView='list';
+var _activeCat=null;
+
 function renderTasksPage(el,showAll){
-  let tasks=showAll?STATE.tasks:STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id));
-  tasks=tasks.filter(t=>!t.recurring);
-  el.innerHTML=`
-  <div class="pg-hdr">
-    <div><div class="pg-title">${showAll?'Tüm <span class="hl">Görevler</span>':'<span class="hl">Görevlerim</span>'}</div></div>
-    ${canManage(STATE.cu)?`<button class="add-btn" onclick="openTaskModal(null,false)">＋ Görev Ekle</button>`:''}
-  </div>
-  <div class="filter-bar">
-    <select class="fsel" id="f-stat" onchange="applyFilters()">
-      <option value="all">Tüm Durumlar</option>
-      ${TASK_STATUSES.map(s=>`<option value="${s.id}">${s.icon} ${s.label}</option>`).join('')}
-    </select>
-    <select class="fsel" id="f-cat" onchange="applyFilters()">
-      <option value="all">Tüm Kategoriler</option>
-      ${CATEGORIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
-      <option value="none">Kategorisiz</option>
-    </select>
-    ${showAll?`<select class="fsel" id="f-ass" onchange="applyFilters()">
-      <option value="all">Tüm Kişiler</option>
-      ${STATE.users.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}
-    </select>`:''}
-    <input class="fsearch" id="f-srch" placeholder="Ara..." oninput="applyFilters()">
-  </div>
-  <div id="task-list">${renderTaskList(tasks,showAll)}</div>`;
+  var allTasks=showAll?STATE.tasks:STATE.tasks.filter(function(t){return t.assignees&&t.assignees.includes(STATE.cu.id);});
+  allTasks=allTasks.filter(function(t){return !t.recurring;});
+  var total=allTasks.length;
+  var devam=allTasks.filter(function(t){return t.status==='devam';}).length;
+  var bekliyor=allTasks.filter(function(t){return !t.done&&(t.status||'bekliyor')==='bekliyor';}).length;
+  var geciken=allTasks.filter(function(t){return !t.done&&t.deadline&&isLate(t.deadline);}).length;
+  var catPills=CATEGORIES.map(function(cat){
+    var cnt=allTasks.filter(function(t){return t.categoryId===cat.id;}).length;
+    if(!cnt&&_activeCat!==cat.id)return'';
+    var isAct=_activeCat===cat.id;
+    var st=isAct?'background:'+cat.color+';border-color:'+cat.color+';color:#080c12':'border-color:'+cat.color+'44;color:'+cat.color;
+    return'<div class="cat-pill'+(isAct?' active':'')+'" data-catid="'+cat.id+'" onclick="setCatFilter(this.dataset.catid)" style="'+st+'">'
+      +'<div class="cp-dot" style="background:'+cat.color+'"></div>'
+      +'<span>'+cat.name+'</span><span class="cp-cnt">'+cnt+'</span></div>';
+  }).join('');
+  el.innerHTML='<div class="pg-hdr">'
+    +'<div><div class="pg-title">'+(showAll?'Tüm <span class="hl">Görevler</span>':'<span class="hl">Görevlerim</span>')+'</div></div>'
+    +'<div style="display:flex;gap:8px;margin-left:auto;align-items:center">'
+    +'<div class="view-toggle">'
+    +'<button class="vt-btn '+(_taskView==='list'?'active':'')+'" onclick="_taskView=\'list\';renderPage()" data-tip="Liste">☰</button>'
+    +'<button class="vt-btn '+(_taskView==='board'?'active':'')+'" onclick="_taskView=\'board\';renderPage()" data-tip="Kanban">⬡</button>'
+    +'</div>'
+    +(canManage(STATE.cu)?'<button class="add-btn" onclick="openTaskModal(null,false)">+ Görev Ekle</button>':'')
+    +'</div></div>'
+    +'<div class="task-stats">'
+    +'<div class="ts-card"><div class="ts-icon">📋</div><div><div class="ts-val">'+total+'</div><div class="ts-lbl">Toplam</div></div></div>'
+    +'<div class="ts-card"><div class="ts-icon">🔄</div><div><div class="ts-val" style="color:var(--blue)">'+devam+'</div><div class="ts-lbl">Devam</div></div></div>'
+    +'<div class="ts-card"><div class="ts-icon">⏳</div><div><div class="ts-val" style="color:var(--amber)">'+bekliyor+'</div><div class="ts-lbl">Bekliyor</div></div></div>'
+    +'<div class="ts-card"><div class="ts-icon">⚠</div><div><div class="ts-val" style="color:var(--red)">'+geciken+'</div><div class="ts-lbl">Gecikmiş</div></div></div>'
+    +'</div>'
+    +'<div class="cat-filter-row">'
+    +'<div class="cat-pill'+(!_activeCat?' active':'')+'" onclick="setCatFilter(null)" style="'+(!_activeCat?'background:var(--gold);color:#080c12':'')+'"><span>Tümü</span><span class="cp-cnt">'+total+'</span></div>'
+    +catPills+'</div>'
+    +'<div class="filter-bar">'
+    +'<select class="fsel" id="f-stat" onchange="applyFilters()"><option value="all">Tüm Durumlar</option>'+TASK_STATUSES.map(function(s){return'<option value="'+s.id+'">'+s.icon+' '+s.label+'</option>';}).join('')+'</select>'
+    +(showAll?'<select class="fsel" id="f-ass" onchange="applyFilters()"><option value="all">Tüm Kişiler</option>'+STATE.users.map(function(u){return'<option value="'+u.id+'">'+esc(u.name)+'</option>';}).join('')+'</select>':'')
+    +'<input class="fsearch" id="f-srch" placeholder="Ara..." oninput="applyFilters()"></div>'
+    +'<div id="task-list">'+(_taskView==='board'?renderBoardView(allTasks):renderTaskList(allTasks,showAll))+'</div>';
 }
 
+function setCatFilter(catId){_activeCat=catId;renderPage();}
+
+function renderBoardView(tasks){
+  var cols=[
+    {id:'bekliyor',label:'Bekliyor',icon:'⏳',color:'var(--amber)'},
+    {id:'devam',label:'Devam Ediyor',icon:'🔄',color:'var(--blue)'},
+    {id:'tamamlandi',label:'Tamamlandı',icon:'✅',color:'var(--green)'},
+    {id:'iptal',label:'İptal',icon:'🚫',color:'var(--red)'},
+  ];
+  return'<div class="status-board">'+cols.map(function(col){
+    var colTasks=tasks.filter(function(t){
+      var st=t.status||'bekliyor';
+      if(col.id==='tamamlandi')return st==='tamamlandi'||t.done;
+      return st===col.id&&!t.done;
+    });
+    if(_activeCat)colTasks=colTasks.filter(function(t){return t.categoryId===_activeCat;});
+    return'<div class="sb-col">'
+      +'<div class="sb-col-hdr"><span style="font-size:14px">'+col.icon+'</span><span class="sh-title" style="color:'+col.color+'">'+col.label+'</span><span class="sh-cnt">'+colTasks.length+'</span></div>'
+      +'<div class="sb-col-body">'+colTasks.map(function(t){
+        var assignees=(t.assignees||[]).map(gU).filter(Boolean);
+        var cat=getCat(t.categoryId);
+        var late=!t.done&&t.deadline&&isLate(t.deadline);
+        return'<div class="sb-mini-card" onclick="openTaskModal(\''+t.id+'\',false)">'
+          +'<div class="pbar pb-'+(t.priority==='high'?'h':t.priority==='low'?'l':'m')+'" style="height:2px;width:100%;margin-bottom:7px;border-radius:2px"></div>'
+          +'<div class="sb-mini-title">'+esc(t.title)+'</div>'
+          +'<div class="sb-mini-meta">'+(cat?'<span class="tag t-cat" style="background:'+cat.color+'22;color:'+cat.color+'">'+cat.name+'</span>':'')
+          +(t.deadline?'<span class="tag t-dl'+(late?' late':'')+'">'+fmtD(t.deadline)+'</span>':'')
+          +'<div style="display:flex;margin-left:auto">'+assignees.slice(0,3).map(function(u){return avatarHTML(u,18);}).join('')+'</div></div></div>';
+      }).join('')+(canManage(STATE.cu)?'<button class="mt-add-card" onclick="openTaskModal(null,false)">+ Ekle</button>':'')+'</div></div>';
+  }).join('')+'</div>';
+}
+
+
 function applyFilters(){
-  const stat=document.getElementById('f-stat')?.value||'all';
-  const cat=document.getElementById('f-cat')?.value||'all';
-  const ass=document.getElementById('f-ass')?.value||'all';
-  const srch=(document.getElementById('f-srch')?.value||'').toLowerCase();
-  const showAll=STATE.page==='all-tasks';
-  let tasks=showAll?STATE.tasks:STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id));
-  tasks=tasks.filter(t=>!t.recurring);
-  if(stat!=='all')tasks=tasks.filter(t=>(t.status||'bekliyor')===stat||(stat==='tamamlandi'&&t.done));
-  if(cat==='none')tasks=tasks.filter(t=>!t.categoryId);
-  else if(cat!=='all')tasks=tasks.filter(t=>t.categoryId===cat);
-  if(ass!=='all')tasks=tasks.filter(t=>t.assignees&&t.assignees.includes(ass));
-  if(srch)tasks=tasks.filter(t=>(t.title||'').toLowerCase().includes(srch)||(t.description||'').toLowerCase().includes(srch));
-  const tl=document.getElementById('task-list');
-  if(tl)tl.innerHTML=renderTaskList(tasks,showAll);
+  var stat=document.getElementById('f-stat')?.value||'all';
+  var ass=document.getElementById('f-ass')?.value||'all';
+  var srch=(document.getElementById('f-srch')?.value||'').toLowerCase();
+  var showAll=STATE.page==='all-tasks';
+  var tasks=showAll?STATE.tasks:STATE.tasks.filter(function(t){return t.assignees&&t.assignees.includes(STATE.cu.id);});
+  tasks=tasks.filter(function(t){return !t.recurring;});
+  if(_activeCat)tasks=tasks.filter(function(t){return t.categoryId===_activeCat;});
+  if(stat!=='all')tasks=tasks.filter(function(t){return (t.status||'bekliyor')===stat||(stat==='tamamlandi'&&t.done);});
+  if(ass!=='all')tasks=tasks.filter(function(t){return t.assignees&&t.assignees.includes(ass);});
+  if(srch)tasks=tasks.filter(function(t){return (t.title||'').toLowerCase().includes(srch)||(t.description||'').toLowerCase().includes(srch);});
+  var tl=document.getElementById('task-list');
+  if(tl)tl.innerHTML=_taskView==='board'?renderBoardView(tasks):renderTaskList(tasks,showAll);
 }
 
 function renderTaskList(tasks,showAll){
@@ -1338,19 +1417,23 @@ function saveTask(id){
 }
 
 // ─── NOTIFICATION SIMULATION ─────────────────────────────────────
-function simulateNotif(task){
-  if(!task.deadline)return;
-  const u=STATE.cu;
-  if(!u.notifEmail&&!u.notifTeams)return;
-  const msg=`📧 Simülasyon: "${task.title}" görevi oluşturuldu. Deadline: ${fmtD(task.deadline)}
-Gerçek sistemde e-posta (${u.email}) ve Teams bildirimi gönderilecek.`;
-  setTimeout(()=>{
-    const notifBox=document.createElement('div');
-    notifBox.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--gold-border);border-radius:var(--r);padding:14px 16px;max-width:320px;z-index:999;font-size:.78rem;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.3)';
-    notifBox.innerHTML=`<div style="color:var(--gold);font-weight:700;margin-bottom:4px">📬 Bildirim Simülasyonu</div><div style="color:var(--text2)">${esc(msg)}</div><div style="text-align:right;margin-top:8px"><button onclick="this.closest('div').remove()" style="padding:4px 10px;background:var(--gold);color:#080c12;border:none;border-radius:5px;cursor:pointer;font-size:.72rem">Tamam</button></div>`;
-    document.body.appendChild(notifBox);
-    setTimeout(()=>notifBox.remove(),8000);
-  },300);
+async function simulateNotif(task){
+  var assignerName=STATE.cu?STATE.cu.name:'Sistem';
+  var dl=task.deadline?fmtD(task.deadline):'Süresiz';
+  var assigneeIds=task.assignees||[];
+  for(var i=0;i<assigneeIds.length;i++){
+    var u=STATE.users.find(function(x){return x.id===assigneeIds[i];});
+    if(u&&u.email){
+      try{
+        await fetch('https://cxhiaqdxfyloxsqcvkyf.supabase.co/functions/v1/send-email',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4aGlhcWR4Znlsb3hzcWN2a3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzQ2MTQsImV4cCI6MjA4OTUxMDYxNH0.8mG3vFFvTir8FvbQVteEJY02SHVYdeUs3Ct0aIrqdgs'},
+          body:JSON.stringify({to:u.email,toName:u.name,subject:'[NIKA BIM] Yeni Görev: '+task.title,taskTitle:task.title,taskDesc:task.description||'',deadline:dl,assignerName:assignerName})
+        });
+      }catch(e){console.error('Mail error:',e);}
+    }
+  }
+  showToast('📬 Bildirim gönderildi');
 }
 
 // ─── CATEGORIES PAGE ──────────────────────────────────────────────
@@ -1527,6 +1610,7 @@ function renderCategoriesPage(el){
   el.innerHTML=`
   <div class="pg-hdr">
     <div><div class="pg-title">Proje <span class="hl">Kategorileri</span></div><div class="pg-sub">Dosya klasörleri ve görev filtreleme</div></div>
+    ${canManage(STATE.cu)?`<button class="add-btn" onclick="openCatManager()">⚙ Yönet</button>`:''}
   </div>
   <div class="cat-grid" id="cat-grid">
     ${CATEGORIES.map(c=>{
@@ -1648,13 +1732,18 @@ function renderMTaskDetail(el){
   <div class="pg-hdr">
     <button class="sec-btn" onclick="STATE.mtSub=null;renderPage()">← Geri</button>
     <div><div class="pg-title" style="color:${b.color||'#f5b80e'}">${esc(b.name)}</div></div>
-    ${canManage(STATE.cu)?`<div style="display:flex;gap:6px;margin-left:auto">
-      <button class="sec-btn" onclick="openBoardModal('${b.id}')">Düzenle</button>
-      <button class="sec-btn" style="border-color:var(--red);color:var(--red)" onclick="delBoard('${b.id}')">Sil</button>
-    </div>`:''}
+    <div style="display:flex;gap:6px;margin-left:auto;align-items:center">
+      <div class="view-toggle">
+        <button class="vt-btn ${(window._bvMode||'kanban')==='kanban'?'active':''}" onclick="window._bvMode='kanban';renderPage()" data-tip="Kanban">⬡</button>
+        <button class="vt-btn ${(window._bvMode||'kanban')==='blueprint'?'active':''}" onclick="window._bvMode='blueprint';renderPage()" data-tip="Blueprint">◈</button>
+      </div>
+      ${canManage(STATE.cu)?`<button class="sec-btn" onclick="openBoardModal('${b.id}')">Düzenle</button>
+      <button class="sec-btn" style="border-color:var(--red);color:var(--red)" onclick="delBoard('${b.id}')">Sil</button>`:''}
+    </div>
   </div>
   <div class="board-wrap">
-    <div class="mt-board" id="mtboard-${b.id}">
+    ${(window._bvMode||'kanban')==='blueprint'?renderBlueprintView(b):''}
+    <div class="mt-board" id="mtboard-${b.id}" style="${(window._bvMode||'kanban')==='blueprint'?'display:none':''}">
       ${(b.columns||[]).map((col,ci)=>`
       <div class="mt-col" id="col-${b.id}-${col.id}">
         <div class="mt-col-hdr">
@@ -1889,22 +1978,69 @@ function saveCard(bid,colId,cardId){
 }
 
 // ─── MEETINGS ─────────────────────────────────────────────────────
+var _meetView='calendar';
+var _calYear=new Date().getFullYear();
+var _calMonth=new Date().getMonth();
+
 function renderMeetingsPage(el){
-  const meets=STATE.meets;
-  const upcoming=meets.filter(m=>new Date(m.date)>=new Date()).sort((a,b)=>a.date.localeCompare(b.date));
-  const past=meets.filter(m=>new Date(m.date)<new Date()).sort((a,b)=>b.date.localeCompare(a.date));
-  el.innerHTML=`
-  <div class="pg-hdr">
-    <div><div class="pg-title">Toplantı <span class="hl">Takvimi</span></div></div>
-    ${canManage(STATE.cu)?`<button class="add-btn" onclick="openMeetModal(null)">＋ Toplantı Planla</button>`:''}
-  </div>
-  <div style="font-size:.72rem;color:var(--text2);padding:8px 12px;background:var(--blue-bg);border:1px solid rgba(56,189,248,.25);border-radius:var(--r);margin-bottom:16px">
-    📅 Toplantılar burada planlanır. Teams entegrasyonu için şirket Teams webhookunuzu Ayarlar bolumunden ekleyin.
-  </div>
-  <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:10px">Yaklaşan</div>
-  ${upcoming.length?upcoming.map(m=>meetCardHTML(m)).join(''):`<div class="empty" style="padding:1rem">Yaklaşan toplantı yok</div>`}
-  ${past.length?`<div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin:16px 0 10px">Geçmiş</div>${past.map(m=>meetCardHTML(m)).join('')}`:''}`;
+  var myMeets=STATE.meets.filter(function(m){
+    return canManage(STATE.cu)||(m.attendees&&m.attendees.includes(STATE.cu.id));
+  });
+  var upcoming=myMeets.filter(function(m){return new Date(m.date+'T00:00:00')>=new Date(new Date().toDateString());}).sort(function(a,b){return a.date.localeCompare(b.date);});
+  var past=myMeets.filter(function(m){return new Date(m.date+'T00:00:00')<new Date(new Date().toDateString());}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  el.innerHTML='<div class="pg-hdr">'
+    +'<div><div class="pg-title">Toplantı <span class="hl">Takvimi</span></div></div>'
+    +(canManage(STATE.cu)?'<button class="add-btn" onclick="openMeetModal(null)">+ Toplantı Planla</button>':'')
+    +'</div>'
+    +'<div class="meet-view-tabs">'
+    +'<button class="mvt '+(_meetView==='calendar'?'active':'')+'" onclick="_meetView=\'calendar\';renderPage()">📅 Takvim</button>'
+    +'<button class="mvt '+(_meetView==='list'?'active':'')+'" onclick="_meetView=\'list\';renderPage()">☰ Liste</button>'
+    +'</div>'
+    +(_meetView==='calendar'?renderMeetCalendar(myMeets):renderMeetList(upcoming,past));
 }
+
+function renderMeetCalendar(meets){
+  var year=_calYear,month=_calMonth;
+  var mN=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  var dN=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  var firstDay=new Date(year,month,1);
+  var lastDay=new Date(year,month+1,0);
+  var startDow=(firstDay.getDay()+6)%7;
+  var today=new Date().toISOString().slice(0,10);
+  var html='<div class="cal-nav">'
+    +'<button class="sec-btn" onclick="_calMonth--;if(_calMonth<0){_calMonth=11;_calYear--;}renderPage()">←</button>'
+    +'<h3>'+mN[month]+' '+year+'</h3>'
+    +'<button class="sec-btn" onclick="_calMonth++;if(_calMonth>11){_calMonth=0;_calYear++;}renderPage()">→</button>'
+    +'<button class="sec-btn" onclick="_calYear=new Date().getFullYear();_calMonth=new Date().getMonth();renderPage()">Bugün</button>'
+    +'</div>'
+    +'<div class="cal-grid">'
+    +dN.map(function(d){return'<div class="cal-hdr">'+d+'</div>';}).join('');
+  for(var i=0;i<startDow;i++)html+='<div class="cal-day other-month"></div>';
+  for(var d=1;d<=lastDay.getDate();d++){
+    var ds=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var dm=meets.filter(function(m){return m.date===ds;});
+    html+='<div class="cal-day'+(ds===today?' today':'')+(dm.length?' has-meet':'')+'" style="position:relative">'
+      +'<div class="cal-day-num">'+d+'</div>'
+      +dm.slice(0,3).map(function(m){return'<div class="cal-meet-chip" onclick="event.stopPropagation();openMeetModal(\''+m.id+'\')">'+esc((m.time?m.time+' ':'')+m.title)+'</div>';}).join('')
+      +(dm.length>3?'<div style="font-size:.58rem;color:var(--text3)">+'+(dm.length-3)+'</div>':'')
+      +(canManage(STATE.cu)?'<div onclick="openMeetModalOnDate(\''+ds+'\',event)" style="position:absolute;bottom:3px;right:4px;color:var(--text3);font-size:14px;cursor:pointer" data-tip="Toplantı ekle">+</div>':'')
+    +'</div>';
+  }
+  return html+'</div>';
+}
+
+function renderMeetList(upcoming,past){
+  return'<div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:10px">Yaklaşan</div>'
+    +(upcoming.length?upcoming.map(meetCardHTML).join(''):'<div class="empty" style="padding:1rem">Yaklaşan toplantı yok</div>')
+    +(past.length?'<div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin:16px 0 10px">Geçmiş</div>'+past.map(meetCardHTML).join(''):'');
+}
+
+function openMeetModalOnDate(date,e){
+  if(e)e.stopPropagation();
+  openMeetModal(null);
+  setTimeout(function(){var el=document.getElementById('mm-d');if(el)el.value=date;},50);
+}
+
 
 function meetCardHTML(m){
   const dt=new Date(m.date);
@@ -2077,6 +2213,18 @@ function getPlannerData(){
 }
 function savePlannerData(data){localStorage.setItem(SK_PLANNER,JSON.stringify(data));}
 
+function getTodayMeetingsHTML(today, uid){
+  var tm=STATE.meets.filter(function(m){return m.date===today&&m.attendees&&m.attendees.includes(uid);}).sort(function(a,b){return(a.time||'').localeCompare(b.time||'');});
+  if(!tm.length)return'<div style="font-size:.78rem;color:var(--text3)">Bugün toplantı yok.</div>';
+  return tm.map(function(m){
+    var ti=m.meetType==='teams'?'💬':m.meetType==='zoom'?'🎥':m.meetType==='telefon'?'📞':'🏢';
+    return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="min-width:44px;text-align:center;font-size:.85rem;font-weight:800;color:var(--blue);font-family:JetBrains Mono,monospace">'+(m.time||'--:--')+'</div>'
+      +'<div style="flex:1"><div style="font-size:.82rem;font-weight:600">'+ti+' '+esc(m.title)+'</div>'
+      +(m.location?'<div style="font-size:.7rem;color:var(--text3)">'+esc(m.location)+'</div>':'')
+      +'</div></div>';
+  }).join('');
+}
 function renderPlannerPage(el){
   const today=new Date().toISOString().slice(0,10);
   const data=getPlannerData();
@@ -2109,6 +2257,10 @@ function renderPlannerPage(el){
     <div class="ozet-widget">
       <h4>📝 Günlük Notlar</h4>
       <textarea id="planner-notes" style="width:100%;min-height:100px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:8px;color:var(--text);font-family:inherit;font-size:.8rem;resize:vertical;outline:none" placeholder="Bugün için notlarını buraya yaz..." onchange="savePlannerNotes()">${esc(dayData.notes||'')}</textarea>
+    </div>
+    <div class="ozet-widget" style="grid-column:1/-1">
+      <h4>📅 Bugünkü Toplantılarım</h4>
+      ${getTodayMeetingsHTML(today, uid)}
     </div>
     <div class="ozet-widget" style="grid-column:1/-1">
       <h4>✅ Bugün Yapılacaklar (Atanmış Görevlerim)</h4>
@@ -2166,6 +2318,138 @@ function togglePlannerCheck(taskId){
   data[uid][today].checked=ch;savePlannerData(data);renderPage();
 }
 
+// ─── BLUEPRINT VIEW ──────────────────────────────────────────────
+function renderBlueprintView(b){
+  var allCards=[];
+  (b.columns||[]).forEach(function(col){(col.cards||[]).forEach(function(card){allCards.push({card:card,col:col});});});
+  if(!allCards.length)return'<div class="empty">Henüz kart yok — önce Kanban görünümünde kart ekleyin</div>';
+  var colW=180,colGap=60,cardH=85,cardGap=12,padX=30,padY=30;
+  var cols=b.columns||[];
+  var totalW=cols.length*(colW+colGap)+padX*2;
+  var maxCards=Math.max.apply(null,cols.map(function(c){return (c.cards||[]).length||0;}));
+  var totalH=Math.max(300, maxCards*(cardH+cardGap)+padY*2+40);
+  var nodeMap={};
+  var nodes=[];
+  cols.forEach(function(col,ci){
+    (col.cards||[]).forEach(function(card,ri){
+      var x=padX+ci*(colW+colGap);
+      var y=padY+40+ri*(cardH+cardGap);
+      var node={id:card.id,card:card,col:col,x:x,y:y,w:colW,h:cardH};
+      nodes.push(node);nodeMap[card.id]=node;
+    });
+  });
+  var arrows='';
+  nodes.forEach(function(n){
+    if(n.card.linkedColId&&nodeMap[n.card.linkedColId]){
+      var from=nodeMap[n.card.linkedColId];
+      var x1=from.x+from.w,y1=from.y+from.h/2,x2=n.x,y2=n.y+n.h/2;
+      arrows+='<path d="M'+x1+' '+y1+' C'+(x1+40)+' '+y1+' '+(x2-40)+' '+y2+' '+x2+' '+y2+'" stroke="#f5b80e" stroke-width="1.5" fill="none" stroke-dasharray="5,3" opacity=".8"/>'
+        +'<polygon points="'+x2+','+y2+' '+(x2-8)+','+(y2-4)+' '+(x2-8)+','+(y2+4)+'" fill="#f5b80e" opacity=".8"/>';
+    }
+  });
+  var colLabels=cols.map(function(col,ci){
+    var x=padX+ci*(colW+colGap);
+    return'<div style="position:absolute;left:'+x+'px;top:'+padY+'px;font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;width:'+colW+'px;text-align:center">'+esc(col.name)+'</div>';
+  }).join('');
+  var nodeHTML=nodes.map(function(n){
+    var st=n.card.status||'bekliyor';
+    var stC=st==='tamamlandi'?'var(--green)':st==='devam'?'var(--blue)':st==='iptal'?'var(--red)':'var(--amber)';
+    var assignees=(n.card.assignees||[]).map(gU).filter(Boolean);
+    var late=n.card.deadline&&isLate(n.card.deadline);
+    return'<div class="bp-node'+(n.card.done?' bp-done':st==='devam'?' bp-active':'')+'" '
+      +'style="left:'+n.x+'px;top:'+n.y+'px;width:'+n.w+'px" '
+      +'data-bid="'+b.id+'" data-cid="'+n.col.id+'" data-cardid="'+n.card.id+'" onclick="bpNodeClick(this)" style="cursor:pointer">'
+      +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">'
+        +'<div style="width:7px;height:7px;border-radius:50%;background:'+stC+';flex-shrink:0"></div>'
+        +'<div class="bp-node-title" style="color:var(--text)">'+esc(n.card.title)+'</div>'
+      +'</div>'
+      +'<div class="bp-node-meta">'
+        +(n.card.deadline?'<span style="color:'+(late?'var(--red)':'var(--text3)')+'">'+fmtD(n.card.deadline)+'</span>':'')
+        +(assignees.length?' · '+assignees.slice(0,2).map(function(u){return esc(u.initials);}).join(' '):'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+  return'<div class="bp-wrap">'
+    +'<div class="bp-canvas" style="width:'+totalW+'px;height:'+totalH+'px">'
+      +'<svg class="bp-svg" viewBox="0 0 '+totalW+' '+totalH+'">'+arrows+'</svg>'
+      +colLabels+nodeHTML
+    +'</div>'
+  +'</div>';
+}
+
+// ─── CATEGORY MANAGER ─────────────────────────────────────────────
+var CAT_COLORS=['#f97316','#38bdf8','#a855f7','#22d3ee','#4ade80','#fb923c','#f5b80e','#94a3b8','#f87171','#c084fc','#34d399','#60a5fa'];
+
+function openCatManager(){
+  var cats=loadCats();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='cat-mgr-ov';
+  ov.innerHTML='<div class="modal"><div class="modal-inner">'
+    +'<div class="modal-hdr"><h3>Proje <span class="hl">Kategorileri</span></h3><button class="close-btn" onclick="closeOv(&quot;cat-mgr-ov&quot;)">✕</button></div>'
+    +'<div id="cat-mgr-list" style="margin-bottom:12px">'
+    +cats.map(function(cat){
+      return'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
+        +'<div style="width:12px;height:12px;border-radius:50%;background:'+cat.color+';flex-shrink:0"></div>'
+        +'<span style="flex:1;font-size:.82rem">'+esc(cat.name)+'</span>'
+        +'<button class="ib" data-catid="'+cat.id+'" onclick="editCat(this.dataset.catid)" data-tip="Düzenle">✏</button>'
+        +'<button class="ib del" data-catid="'+cat.id+'" onclick="deleteCat(this.dataset.catid)" data-tip="Sil">✕</button>'
+      +'</div>';
+    }).join('')
+    +'</div>'
+    +'<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:12px">'
+    +'<div style="font-size:.75rem;font-weight:700;color:var(--text2);margin-bottom:8px">Yeni Kategori Ekle</div>'
+    +'<input class="finput" id="nc-name" placeholder="Kategori adı" style="margin-bottom:8px">'
+    +'<div class="color-pick" id="nc-colors">'
+    +CAT_COLORS.map(function(col){return'<div class="cp-swatch" style="background:'+col+'" data-c="'+col+'" onclick="selCatColor(this.dataset.c)"></div>';}).join('')
+    +'</div>'
+    +'<input type="hidden" id="nc-color" value="'+CAT_COLORS[0]+'">'
+    +'<button class="btn-ok" style="margin-top:10px;width:100%" onclick="addNewCat()">+ Ekle</button>'
+    +'</div>'
+  +'</div></div>';
+  document.body.appendChild(ov);
+  setTimeout(function(){var f=document.querySelector('#nc-colors .cp-swatch');if(f)f.classList.add('sel');},50);
+}
+
+function selCatColor(col){
+  document.getElementById('nc-color').value=col;
+  document.querySelectorAll('#nc-colors .cp-swatch').forEach(function(s){s.classList.remove('sel');});
+  var el=document.querySelector('#nc-colors .cp-swatch[data-c="'+col+'"]');
+  if(el)el.classList.add('sel');
+}
+
+function addNewCat(){
+  var name=document.getElementById('nc-name')?.value.trim();
+  var color=document.getElementById('nc-color')?.value||'#f97316';
+  if(!name){showToast('Kategori adı zorunlu','var(--red)');return;}
+  var cats=loadCats();
+  cats.push({id:'cat_'+genId(),name:name.toUpperCase(),color:color});
+  saveCats(cats);CATEGORIES=cats;
+  closeOv('cat-mgr-ov');renderPage();
+  showToast('✓ Kategori eklendi');
+}
+
+function deleteCat(id){
+  if(!confirm('Kategori silinsin mi?'))return;
+  var cats=loadCats().filter(function(c){return c.id!==id;});
+  saveCats(cats);CATEGORIES=cats;
+  STATE.tasks.forEach(function(t){if(t.categoryId===id)t.categoryId=null;});
+  svTasks();closeOv('cat-mgr-ov');renderPage();
+}
+
+function editCat(id){
+  var cats=loadCats();
+  var cat=cats.find(function(c){return c.id===id;});
+  if(!cat)return;
+  var newName=prompt('Kategori adı:',cat.name);
+  if(!newName||!newName.trim())return;
+  cat.name=newName.trim().toUpperCase();
+  saveCats(cats);CATEGORIES=cats;
+  closeOv('cat-mgr-ov');renderPage();
+}
+
+function bpNodeClick(el){
+  var bid=el.dataset.bid,cid=el.dataset.cid,cardid=el.dataset.cardid;
+  openCardModal(bid,cid,cardid);
+}
 // ─── SETTINGS PAGE ────────────────────────────────────────────────
 function renderSettingsPage(el){
   const u=STATE.cu;
@@ -2311,6 +2595,7 @@ function deleteUser(id){
 function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 
 // ─── INIT ─────────────────────────────────────────────────────────
+['nika_t_v4','nika_mt_v2','nika_users_v1','nika_meets_v1'].forEach(function(k){localStorage.removeItem(k);});
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
@@ -2419,15 +2704,17 @@ function stopModalRec(){
     return 'Sen NIKA BIM & DC Management sirketinin AI asistanisin. Turkce yanitla. Bugun: '+today+'.\n\nEKIP: '+(users||'Kayitli kullanici yok.')+'\n\nKATEGORILER: '+catLines+'\n\nGOREVLER ('+STATE.tasks.length+' toplam):\n'+(taskLines||'Gorev yok.')+'\n\nMULTI-TASK PANOLAR:\n'+(boardLines||'Pano yok.')+'\n\nKullanici sorularinda bu verileri kullan. Analiz, ozet ve oneri sunabilirsin.';
   }
 
+  var GROQ_KEY='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';
   function callClaude(messages, system, cb){
-    fetch('https://api.anthropic.com/v1/messages',{
+    var msgs=[{role:'system',content:system}].concat(messages);
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:system,messages:messages})
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,messages:msgs})
     }).then(function(r){return r.json()}).then(function(d){
       if(d.error)cb(null,d.error.message);
-      else cb((d.content&&d.content[0]&&d.content[0].text)||'',null);
-    }).catch(function(e){cb(null,e.message)});
+      else cb((d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'',null);
+    }).catch(function(e){cb(null,e.message);});
   }
 
   function whisper(blob, cb){
