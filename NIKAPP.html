@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_171152">
+<meta name="version" content="v20260321_171749">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -457,6 +457,7 @@ svg.bp-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:
 .task-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
 .ts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
 .ts-card:hover{border-color:var(--border2)}
+.ts-card.active{border-color:var(--gold-border);background:var(--gold-bg)}
 .ts-icon{font-size:18px;flex-shrink:0}
 .ts-val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
 .ts-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
@@ -1007,10 +1008,10 @@ function renderTasksPage(el,showAll){
     +(canManage(STATE.cu)?'<button class="add-btn" onclick="openTaskModal(null,false)">+ Görev Ekle</button>':'')
     +'</div></div>'
     +'<div class="task-stats">'
-    +'<div class="ts-card"><div class="ts-icon">📋</div><div><div class="ts-val">'+total+'</div><div class="ts-lbl">Toplam</div></div></div>'
-    +'<div class="ts-card"><div class="ts-icon">🔄</div><div><div class="ts-val" style="color:var(--blue)">'+devam+'</div><div class="ts-lbl">Devam</div></div></div>'
-    +'<div class="ts-card"><div class="ts-icon">⏳</div><div><div class="ts-val" style="color:var(--amber)">'+bekliyor+'</div><div class="ts-lbl">Bekliyor</div></div></div>'
-    +'<div class="ts-card"><div class="ts-icon">⚠</div><div><div class="ts-val" style="color:var(--red)">'+geciken+'</div><div class="ts-lbl">Gecikmiş</div></div></div>'
+    +'<div class="ts-card'+(_statFilter==='all'?' active':'')+'" onclick="setStatFilter(\'all\')" data-tip="Tümünü göster"><div class="ts-icon">📋</div><div><div class="ts-val">'+total+'</div><div class="ts-lbl">Toplam</div></div></div>'
+    +'<div class="ts-card'+(_statFilter==='devam'?' active':'')+'" onclick="setStatFilter(\'devam\')" data-tip="Devam edenleri filtrele"><div class="ts-icon">🔄</div><div><div class="ts-val" style="color:var(--blue)">'+devam+'</div><div class="ts-lbl">Devam</div></div></div>'
+    +'<div class="ts-card'+(_statFilter==='bekliyor'?' active':'')+'" onclick="setStatFilter(\'bekliyor\')" data-tip="Bekleyenleri filtrele"><div class="ts-icon">⏳</div><div><div class="ts-val" style="color:var(--amber)">'+bekliyor+'</div><div class="ts-lbl">Bekliyor</div></div></div>'
+    +'<div class="ts-card'+(_statFilter==='geciken'?' active':'')+'" onclick="setStatFilter(\'geciken\')" data-tip="Gecikenleri filtrele" style="'+(_statFilter==='geciken'?'border-color:var(--red-bg)':'')+'"><div class="ts-icon">⚠</div><div><div class="ts-val" style="color:var(--red)">'+geciken+'</div><div class="ts-lbl">Gecikmiş</div></div></div>'
     +'</div>'
     +'<div class="cat-filter-row">'
     +'<div class="cat-pill'+(!_activeCat?' active':'')+'" onclick="setCatFilter(null)" style="'+(!_activeCat?'background:var(--gold);color:#080c12':'')+'"><span>Tümü</span><span class="cp-cnt">'+total+'</span></div>'
@@ -1022,6 +1023,18 @@ function renderTasksPage(el,showAll){
     +'<div id="task-list">'+(_taskView==='board'?renderBoardView(allTasks):renderTaskList(allTasks,showAll))+'</div>';
 }
 
+function setStatFilter(stat){
+  _statFilter=stat;
+  setTimeout(function(){
+    var el=document.getElementById('f-stat');
+    if(el){
+      if(stat==='geciken')el.value='all';
+      else el.value=stat;
+    }
+    applyFilters();
+  },10);
+  renderPage();
+}
 function setCatFilter(catId){_activeCat=catId;renderPage();}
 
 function renderBoardView(tasks){
@@ -1062,8 +1075,15 @@ function applyFilters(){
   var showAll=STATE.page==='all-tasks';
   var tasks=showAll?STATE.tasks:STATE.tasks.filter(function(t){return t.assignees&&t.assignees.includes(STATE.cu.id);});
   tasks=tasks.filter(function(t){return !t.recurring;});
+  // Category filter (pill buttons) — independent
   if(_activeCat)tasks=tasks.filter(function(t){return t.categoryId===_activeCat;});
-  if(stat!=='all')tasks=tasks.filter(function(t){return (t.status||'bekliyor')===stat||(stat==='tamamlandi'&&t.done);});
+  // Status filter — from dropdown OR stat card
+  var activeStat=_statFilter!=='all'?_statFilter:stat;
+  if(activeStat==='geciken'){
+    tasks=tasks.filter(function(t){return !t.done&&t.deadline&&isLate(t.deadline);});
+  } else if(activeStat!=='all'){
+    tasks=tasks.filter(function(t){return (t.status||'bekliyor')===activeStat||(activeStat==='tamamlandi'&&t.done);});
+  }
   if(ass!=='all')tasks=tasks.filter(function(t){return t.assignees&&t.assignees.includes(ass);});
   if(srch)tasks=tasks.filter(function(t){return (t.title||'').toLowerCase().includes(srch)||(t.description||'').toLowerCase().includes(srch);});
   var tl=document.getElementById('task-list');
