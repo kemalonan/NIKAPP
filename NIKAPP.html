@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_172347">
+<meta name="version" content="v20260321_180326">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -364,11 +364,97 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 
 /* ── RESPONSIVE ───────────────────────────────────── */
 @media(max-width:768px){
-  .shell{grid-template-columns:1fr;grid-template-rows:52px auto 1fr}
-  .sidebar{display:none;position:fixed;top:52px;left:0;bottom:0;z-index:200}
-  .sidebar.open{display:flex}
+  /* ── Shell layout ── */
+  .shell{grid-template-columns:1fr;grid-template-rows:52px 1fr}
+  .topbar{padding:0 12px}
+  .tb-logo span{display:none}
+
+  /* ── Sidebar: slide-in drawer ── */
+  .sidebar{
+    display:flex;position:fixed;
+    top:0;left:-260px;bottom:0;
+    width:240px;z-index:500;
+    transition:left .25s ease;
+    box-shadow:4px 0 24px rgba(0,0,0,.4);
+    padding-top:52px;
+  }
+  .sidebar.open{left:0}
+  .sb-overlay{display:block}
+
+  /* ── Main content ── */
+  .main{padding:12px;overflow-y:auto}
+  .pg-hdr{flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .pg-title{font-size:1.1rem}
+
+  /* ── Task stats: 2x2 grid on mobile ── */
+  .task-stats{grid-template-columns:1fr 1fr;gap:6px}
+  .ts-val{font-size:1.1rem}
+  .ts-icon{font-size:15px}
+
+  /* ── Category pills: scrollable row ── */
+  .cat-filter-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .cat-filter-row::-webkit-scrollbar{height:2px}
+  .cat-pill{flex-shrink:0}
+
+  /* ── Filter bar ── */
+  .filter-bar{flex-direction:column;gap:6px}
+  .fsel,.fsearch{width:100%}
+
+  /* ── Status board: horizontal scroll ── */
+  .status-board{grid-template-columns:repeat(4,240px);overflow-x:auto;padding-bottom:8px}
+
+  /* ── Task card ── */
+  .tc-row{flex-direction:column;gap:8px}
+  .tc-actions{flex-direction:row;flex-wrap:wrap}
+
+  /* ── Calendar: smaller cells ── */
+  .cal-grid{gap:1px}
+  .cal-day{min-height:52px;padding:2px}
+  .cal-day-num{font-size:.62rem}
+  .cal-meet-chip{font-size:.5rem;padding:1px 3px}
+  .cal-hdr{font-size:.55rem;padding:4px 0}
+
+  /* ── Meetings card ── */
+  .meet-card{flex-direction:column;gap:8px}
+
+  /* ── Modal: full width ── */
+  .modal{width:100%;max-width:100%;margin:0;border-radius:var(--rl) var(--rl) 0 0;position:fixed;bottom:0;left:0;right:0;max-height:90vh;overflow-y:auto}
+  .overlay{align-items:flex-end}
+
+  /* ── Ozet grid ── */
+  .ozet-grid{grid-template-columns:1fr}
+  .stat-cards{grid-template-columns:1fr 1fr}
+
+  /* ── Forms ── */
   .frow{grid-template-columns:1fr}
+  .fgrid{gap:10px}
+
+  /* ── People grid ── */
+  .people-grid{grid-template-columns:1fr 1fr}
+
+  /* ── View toggle ── */
+  .view-toggle .vt-btn{padding:5px 8px;font-size:11px}
+
+  /* ── AI panel ── */
+  .ai-panel{width:calc(100vw - 24px);right:12px;bottom:80px}
+  .ai-fab{bottom:16px;right:16px;width:46px;height:46px;font-size:18px}
+
+  /* ── Blueprint: scroll ── */
+  .bp-wrap{padding:10px}
+  .bp-canvas{min-width:600px}
 }
+
+@media(max-width:480px){
+  .task-stats{grid-template-columns:1fr 1fr;gap:4px}
+  .ts-card{padding:8px 10px}
+  .people-grid{grid-template-columns:1fr}
+  .stat-cards{grid-template-columns:1fr}
+  .pg-title{font-size:1rem}
+  .add-btn{font-size:.72rem;padding:6px 10px}
+}
+
+/* ── Sidebar overlay (mobile backdrop) ── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:499;backdrop-filter:blur(2px)}
 
 /* ── AI PANEL ─────────────────────────────────────── */
 .ai-fab{position:fixed;bottom:24px;right:24px;z-index:900;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#f5b80e,#ea580c);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(245,184,14,.4),0 0 0 0 rgba(245,184,14,.3);animation:aipulse 2.5s infinite}
@@ -906,6 +992,30 @@ function doLogin(){
 
 function logout(){STATE.cu=null;cS();render()}
 
+function toggleSidebar(){
+  var sb=document.getElementById('sb');
+  var ov=document.getElementById('sb-overlay');
+  if(!sb)return;
+  sb.classList.toggle('open');
+  if(ov)ov.style.display=sb.classList.contains('open')?'block':'none';
+}
+
+function checkMobileLayout(){
+  var btn=document.getElementById('sb-toggle');
+  if(!btn)return;
+  if(window.innerWidth<=768){
+    btn.style.display='flex';
+  } else {
+    btn.style.display='none';
+    var sb=document.getElementById('sb');
+    var ov=document.getElementById('sb-overlay');
+    if(sb)sb.classList.remove('open');
+    if(ov)ov.style.display='none';
+  }
+}
+
+window.addEventListener('resize',checkMobileLayout);
+
 // ─── SHELL ───────────────────────────────────────────────────────
 function renderShell(){
   const myT=STATE.tasks.filter(t=>t.assignees&&t.assignees.includes(STATE.cu.id)&&!t.done).length;
@@ -913,6 +1023,7 @@ function renderShell(){
   document.body.innerHTML=`
   <div class="shell">
     <div class="topbar">
+      <button id="sb-toggle" onclick="toggleSidebar()" style="display:none;background:transparent;border:1px solid var(--border);border-radius:var(--r);color:var(--text2);width:34px;height:34px;cursor:pointer;font-size:16px;align-items:center;justify-content:center;flex-shrink:0">☰</button>
       <div class="tb-logo"><img src="${LOGO}" alt="NIKA BIM" style="height:38px;mix-blend-mode:screen;filter:drop-shadow(0 0 8px rgba(245,184,14,0.5)) contrast(1.1) brightness(1.05)"></div>
       <div class="tb-sep"></div>
       <div class="tb-title">İş Takip Sistemi</div>
@@ -957,6 +1068,7 @@ function renderShell(){
         <button class="logout-btn" onclick="logout()">⏻ Çıkış</button>
       </div>
     </div>
+    <div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
     <div class="main" id="main">
       <div class="pc" id="pc"></div>
     </div>
