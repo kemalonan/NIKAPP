@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_172033">
+<meta name="version" content="v20260321_172347">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -458,6 +458,7 @@ svg.bp-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:
 .ts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
 .ts-card:hover{border-color:var(--border2)}
 .ts-card.active{border-color:var(--gold-border);background:var(--gold-bg)}
+.cat-pill-warn{box-shadow:0 0 0 1px rgba(248,113,113,0.3)}
 .ts-icon{font-size:18px;flex-shrink:0}
 .ts-val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
 .ts-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
@@ -991,13 +992,20 @@ function renderTasksPage(el,showAll){
   var bekliyor=allTasks.filter(function(t){return !t.done&&(t.status||'bekliyor')==='bekliyor';}).length;
   var geciken=allTasks.filter(function(t){return !t.done&&t.deadline&&isLate(t.deadline);}).length;
   var catPills=CATEGORIES.map(function(cat){
-    var cnt=allTasks.filter(function(t){return t.categoryId===cat.id;}).length;
+    var catAll=allTasks.filter(function(t){return t.categoryId===cat.id;});
+    var cnt=catAll.length;
     if(!cnt&&_activeCat!==cat.id)return'';
+    var done=catAll.filter(function(t){return t.done||t.status==='tamamlandi';}).length;
+    var late=catAll.filter(function(t){return !t.done&&t.deadline&&isLate(t.deadline);}).length;
     var isAct=_activeCat===cat.id;
     var st=isAct?'background:'+cat.color+';border-color:'+cat.color+';color:#080c12':'border-color:'+cat.color+'44;color:'+cat.color;
-    return'<div class="cat-pill'+(isAct?' active':'')+'" data-catid="'+cat.id+'" onclick="setCatFilter(this.dataset.catid)" style="'+st+'">'
+    var tip=cat.name+': '+cnt+' görev, '+done+' tamamlandı'+(late?' · '+late+' gecikmiş':'');
+    return'<div class="cat-pill'+(isAct?' active':'')+(late?' cat-pill-warn':'')+'" data-catid="'+cat.id+'" onclick="setCatFilter(this.dataset.catid)" style="'+st+'" data-tip="'+tip+'">'
       +'<div class="cp-dot" style="background:'+cat.color+'"></div>'
-      +'<span>'+cat.name+'</span><span class="cp-cnt">'+cnt+'</span></div>';
+      +'<span>'+cat.name+'</span>'
+      +'<span class="cp-cnt">'+cnt+'</span>'
+      +(late?'<span style="font-size:.6rem;margin-left:2px">⚠</span>':'')
+      +'</div>';
   }).join('');
   el.innerHTML='<div class="pg-hdr">'
     +'<div><div class="pg-title">'+(showAll?'Tüm <span class="hl">Görevler</span>':'<span class="hl">Görevlerim</span>')+'</div></div>'
@@ -1036,7 +1044,10 @@ function setStatFilter(stat){
   },10);
   renderPage();
 }
-function setCatFilter(catId){_activeCat=catId;renderPage();}
+function setCatFilter(catId){
+  _activeCat=catId;
+  renderPage();
+}
 
 function renderBoardView(tasks){
   var cols=[
