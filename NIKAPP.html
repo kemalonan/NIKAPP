@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260323_171213">
+<meta name="version" content="v20260323_172353">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1082,6 +1082,7 @@ var _taskView='list';
 var _syncLock=false;
 var _activeCat=null;
 var _statFilter='all';
+var _sortMode='deadline';
 
 function renderTasksPage(el,showAll){
   var allTasks=showAll?STATE.tasks:STATE.tasks.filter(function(t){return t.assignees&&t.assignees.includes(STATE.cu.id);});
