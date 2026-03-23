@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260321_180326">
+<meta name="version" content="v20260323_164423">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -644,9 +644,10 @@ async function sbDelete(table, id){
 // ─── DB ↔ STATE MAPPERS ──────────────────────────────────────────
 function taskToDb(t){return{
   id:t.id,title:t.title,description:t.description||'',
-  assignees:t.assignees||[],category_id:t.categoryId||null,
+  assignees:t.assignees||[],owner_id:t.ownerId||null,category_id:t.categoryId||null,
   deadline:t.deadline||null,priority:t.priority||'mid',
   status:t.status||'bekliyor',done:!!t.done,recurring:!!t.recurring,
+  completed_by:t.completedBy||null,completed_at:t.completedAt||null,
   last_renew_month:t.lastRenewMonth||null,image_url:t.imageUrl||null,
   subtasks:JSON.stringify(t.subtasks||[]),
   comments:JSON.stringify(t.comments||[]),
@@ -655,7 +656,8 @@ function taskToDb(t){return{
 };}
 function taskFromDb(r){return{
   id:r.id,title:r.title,description:r.description||'',
-  assignees:r.assignees||[],categoryId:r.category_id,
+  assignees:r.assignees||[],ownerId:r.owner_id||null,categoryId:r.category_id,
+  completedBy:r.completed_by||null,completedAt:r.completed_at||null,
   deadline:r.deadline,priority:r.priority,status:r.status,
   done:r.done,recurring:r.recurring,lastRenewMonth:r.last_renew_month,
   imageUrl:r.image_url,
@@ -789,12 +791,8 @@ async function loadFromSupabase(){
 
   } catch(e){
     console.error('Supabase load error:',e);
-    // Fallback to localStorage
-    STATE.tasks=JSON.parse(localStorage.getItem(SK_TASKS)||'[]').map?JSON.parse(localStorage.getItem(SK_TASKS)||'[]'):[];
-    STATE.users=JSON.parse(localStorage.getItem(SK_USERS)||'[]');
-    STATE.meets=JSON.parse(localStorage.getItem(SK_MEETS)||'[]');
-    STATE.mtasks=JSON.parse(localStorage.getItem(SK_MT)||'[]');
-    showToast('⚠ Veritabanına bağlanılamadı, çevrimdışı mod','var(--red)');
+    STATE.tasks=[];STATE.users=[...DEFAULT_USERS];STATE.meets=[];STATE.mtasks=[];
+    showToast('⚠ Veritabanına bağlanılamadı','var(--red)');
   }
   hideLoadingScreen();
   startRealtime();
@@ -1268,7 +1266,7 @@ function taskCardHTML(t,isSubtask){
             <div style="position:relative;flex-shrink:0">
               <span class="st-badge ${st.cls}" onclick="toggleStDrop('${t.id}')">${st.icon} ${st.label} ▾</span>
               <div class="st-drop" id="std-${t.id}" style="display:none">
-                ${TASK_STATUSES.map(s=>`<div class="st-drop-item" onclick="setTaskStatus('${t.id}','${s.id}')"><span>${s.icon}</span><span>${s.label}</span></div>`).join('')}
+                ${(canManage(STATE.cu)?TASK_STATUSES:TASK_STATUSES.filter(s=>s.id==='tamamlandi'||s.id===(t.status||'bekliyor'))).map(s=>`<div class="st-drop-item" onclick="setTaskStatus('${t.id}','${s.id}')"><span>${s.icon}</span><span>${s.label}</span></div>`).join('')}
               </div>
             </div>
           </div>
@@ -1294,6 +1292,7 @@ function taskCardHTML(t,isSubtask){
       <span class="cmmt-tog" onclick="toggleCmts('${t.id}')">💬 ${cmts.length}${isOC?' ▴':' ▾'}</span>
       ${subtasks.length?`<span class="cmmt-tog" onclick="toggleSubs('${t.id}')" style="color:var(--gold)">⊂ ${subtasks.length} alt görev${isOS?' ▴':' ▾'}</span>`:''}
       ${canAct?`<span class="file-tog" onclick="toggleFiles('${t.id}')">📎${isOF?' ▴':' ▾'}</span>`:''}
+      <span style="margin-left:auto;font-size:.62rem;color:var(--text3)">${getTaskInfoLine(t)}</span>
     </div>
     ${isOC?cmtsHTML(t):''}
     ${isOF?filesHTML(t):''}
@@ -1301,6 +1300,16 @@ function taskCardHTML(t,isSubtask){
   </div>`;
 }
 
+function getTaskInfoLine(t){
+  var creator=t.createdBy?gU(t.createdBy):null;
+  var createdStr=creator?'📌 '+esc(creator.name)+' · '+fmtDT(t.createdAt):'📌 '+fmtDT(t.createdAt);
+  if((t.status==='tamamlandi'||t.done)&&t.completedBy){
+    var completer=gU(t.completedBy);
+    var completedStr=completer?'✅ '+esc(completer.name)+' · '+fmtDT(t.completedAt):'✅ '+fmtDT(t.completedAt);
+    return createdStr+'<br>'+completedStr;
+  }
+  return createdStr;
+}
 function toggleDone(id){
   const t=STATE.tasks.find(x=>x.id===id);if(!t)return;
   if(!canManage(STATE.cu)&&!(t.assignees&&t.assignees.includes(STATE.cu.id)))return;
@@ -1323,7 +1332,18 @@ function toggleStDrop(id){
 }
 function setTaskStatus(id,statusId){
   const t=STATE.tasks.find(x=>x.id===id);if(!t)return;
+  // Permission: patron/koordinator OR assignee
+  const canChange=canManage(STATE.cu)||(t.assignees&&t.assignees.includes(STATE.cu.id));
+  if(!canChange)return;
+  // Assignee can only set tamamlandi
+  if(!canManage(STATE.cu)&&statusId!=='tamamlandi')return;
   t.status=statusId;t.done=statusId==='tamamlandi';
+  if(statusId==='tamamlandi'){
+    t.completedBy=STATE.cu.id;
+    t.completedAt=new Date().toISOString();
+  } else {
+    t.completedBy=null;t.completedAt=null;
+  }
   svTasks();
   document.querySelectorAll('.st-drop').forEach(x=>x.style.display='none');
   const el=document.getElementById('tc-'+id);if(el)el.outerHTML=taskCardHTML(t);
@@ -2010,7 +2030,9 @@ function delCol(bid,cid){
 }
 function delBoard(id){
   if(!confirm('Pano silinsin mi?'))return;
-  STATE.mtasks=STATE.mtasks.filter(x=>x.id!==id);svMT();STATE.mtSub=null;renderPage();
+  STATE.mtasks=STATE.mtasks.filter(x=>x.id!==id);
+  sbDelete('mtasks',id);
+  STATE.mtSub=null;renderPage();
 }
 
 // ─── BOARD MODAL ─────────────────────────────────────────────────
@@ -2279,7 +2301,7 @@ function simulateTeamsInvite(title,date,time,attendees){
   toast.innerHTML='💬 <strong>Teams toplantısı simülasyonu</strong><br>'+esc(title)+' · '+esc(date||'')+(time?' '+esc(time):'')+'<br><span style="font-size:.7rem;opacity:.8">Katılımcılar: '+esc(names||'—')+'</span>';
   document.body.appendChild(toast);setTimeout(()=>toast.remove(),5000);
 }
-function delMeet(id){if(!confirm('Toplantı silinsin mi?'))return;STATE.meets=STATE.meets.filter(x=>x.id!==id);svMeets();renderPage();}
+function delMeet(id){if(!confirm('Toplantı silinsin mi?'))return;STATE.meets=STATE.meets.filter(x=>x.id!==id);sbDelete('meetings',id);renderPage();}
 
 // ─── OZET PAGE ────────────────────────────────────────────────────
 function renderOzetPage(el){
@@ -2739,7 +2761,7 @@ function deleteUser(id){
 function closeOv(id){const el=document.getElementById(id);if(el)el.remove()}
 
 // ─── INIT ─────────────────────────────────────────────────────────
-['nika_t_v4','nika_mt_v2','nika_users_v1','nika_meets_v1'].forEach(function(k){localStorage.removeItem(k);});
+['nika_t_v4','nika_mt_v2','nika_cats_v2','nika_users_v1','nika_meets_v1','nika_social_v1'].forEach(function(k){localStorage.removeItem(k);});
 const sess=gS();
 loadFromSupabase().then(function(){
   if(sess){STATE.cu=STATE.users.find(function(u){return u.id===sess.id;})||null;}
