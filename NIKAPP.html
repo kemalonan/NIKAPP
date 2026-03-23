@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260323_170323">
+<meta name="version" content="v20260323_170639">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -719,22 +719,8 @@ function socialFromDb(r){return{
 // ─── REALTIME ────────────────────────────────────────────────────
 var _realtimeChannel=null;
 function startRealtime(){
-  // Poll every 8 seconds for updates (simple polling, no websocket needed)
-  setInterval(async function(){
-    if(!STATE.cu||_syncLock)return;
-    try{
-      var tasks=await sbGet('tasks');
-      if(!tasks||!tasks.length&&STATE.tasks.length>0)return; // don't overwrite with empty
-      var newTasks=tasks.map(taskFromDb);
-      // Only update if DB has more/different tasks than STATE
-      var stateIds=STATE.tasks.map(function(t){return t.id;}).sort().join(',');
-      var dbIds=newTasks.map(function(t){return t.id;}).sort().join(',');
-      if(stateIds!==dbIds){
-        STATE.tasks=newTasks;
-        renderPage();
-      }
-    }catch(e){/* silent */}
-  },8000);
+  // Polling disabled — prevents race condition with save
+  // Will be replaced with Supabase Realtime websockets
 }
 
 // ─── SAVE WRAPPERS (replace localStorage sv()) ───────────────────
@@ -1582,7 +1568,7 @@ async function saveTask(id){
   else STATE.tasks.push({id:genId(),done:false,status:'bekliyor',subtasks:[],createdBy:STATE.cu.id,createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),...data});
   closeOv('task-ov');renderPage();
   await svTasks();
-  simulateNotif(data);
+  simulateNotif(data).catch(function(){});
 }
 
 // ─── NOTIFICATION SIMULATION ─────────────────────────────────────
