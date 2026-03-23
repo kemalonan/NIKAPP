@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="v20260323_164423">
+<meta name="version" content="v20260323_170323">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -721,13 +721,15 @@ var _realtimeChannel=null;
 function startRealtime(){
   // Poll every 8 seconds for updates (simple polling, no websocket needed)
   setInterval(async function(){
-    if(!STATE.cu)return;
+    if(!STATE.cu||_syncLock)return;
     try{
       var tasks=await sbGet('tasks');
+      if(!tasks||!tasks.length&&STATE.tasks.length>0)return; // don't overwrite with empty
       var newTasks=tasks.map(taskFromDb);
-      // Check if anything changed
-      if(JSON.stringify(newTasks.map(t=>t.id+'_'+t.status+'_'+t.done))!==
-         JSON.stringify(STATE.tasks.map(t=>t.id+'_'+t.status+'_'+t.done))){
+      // Only update if DB has more/different tasks than STATE
+      var stateIds=STATE.tasks.map(function(t){return t.id;}).sort().join(',');
+      var dbIds=newTasks.map(function(t){return t.id;}).sort().join(',');
+      if(stateIds!==dbIds){
         STATE.tasks=newTasks;
         renderPage();
       }
@@ -1091,6 +1093,7 @@ function renderPage(){
 
 // ─── TASKS PAGE ──────────────────────────────────────────────────
 var _taskView='list';
+var _syncLock=false;
 var _activeCat=null;
 var _statFilter='all';
 
@@ -1338,13 +1341,14 @@ function setTaskStatus(id,statusId){
   // Assignee can only set tamamlandi
   if(!canManage(STATE.cu)&&statusId!=='tamamlandi')return;
   t.status=statusId;t.done=statusId==='tamamlandi';
+  _syncLock=true;
   if(statusId==='tamamlandi'){
     t.completedBy=STATE.cu.id;
     t.completedAt=new Date().toISOString();
   } else {
     t.completedBy=null;t.completedAt=null;
   }
-  svTasks();
+  _syncLock=true;svTasks().then(function(){_syncLock=false;});
   document.querySelectorAll('.st-drop').forEach(x=>x.style.display='none');
   const el=document.getElementById('tc-'+id);if(el)el.outerHTML=taskCardHTML(t);
 }
@@ -1559,7 +1563,7 @@ function openTaskModal(id,forceRec){
   if(t&&!t.deadline)document.getElementById('tm-dl').disabled=true;
 }
 
-function saveTask(id){
+async function saveTask(id){
   const title=document.getElementById('tm-t')?.value.trim();
   const assignees=[...document.querySelectorAll('#task-ov input[type=checkbox][id^=ms-]:checked')].map(x=>x.value);
   if(!title){alert('Başlık zorunlu');return}
@@ -1576,7 +1580,8 @@ function saveTask(id){
   };
   if(id){const i=STATE.tasks.findIndex(t=>t.id===id);if(i>-1)STATE.tasks[i]={...STATE.tasks[i],...data}}
   else STATE.tasks.push({id:genId(),done:false,status:'bekliyor',subtasks:[],createdBy:STATE.cu.id,createdAt:new Date().toISOString(),comments:[],files:[],lastRenewMonth:thisMonth(),...data});
-  svTasks();closeOv('task-ov');renderPage();
+  closeOv('task-ov');renderPage();
+  await svTasks();
   simulateNotif(data);
 }
 
